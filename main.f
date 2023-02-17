@@ -4,13 +4,13 @@
 !======================================================================!
 ! Includes all external fortran files
 !======================================================================!
-        include 'useful_constants.f'
-        include 'res_arrays.f'
-	include 'model.f'
-        include 'intx.f'
-	include 'resonance_plots.f'
-	include 'coupling_mc.f'
-	include 'computer.f'
+        include 'Dependencies/useful_constants.f'
+        include 'Dependencies/res_arrays.f'
+	include 'Dependencies/model.f'
+        include 'Dependencies/intx.f'
+	include 'Dependencies/resonance_plots.f'
+	include 'Dependencies/coupling_mc.f'
+	include 'Dependencies/computer.f'
 !======================================================================!
 ! MAIN
 !======================================================================!
@@ -34,10 +34,10 @@
 	call res_params
 	call readcouplings
 	call init_random_seed2 ()
-!	write(*,*) 'Now writing single resonance files'
-!	call write_singres(qsq)
-!	call cpu_time(finish)
-!	print '("Time = ",f10.1," seconds.")',finish-start
+	write(*,*) 'Now writing single resonance files'
+	call write_singres(qsq)
+	call cpu_time(finish)
+	print '("Time = ",f10.1," seconds.")',finish-start
 !	write(*,*) 'Now writing truncated moments'
 !	call write_trunc_mom
 !	call cpu_time(finish)
@@ -46,10 +46,10 @@
 !	call write_ressamp(qsq)
 !	call cpu_time(finish)
 !	print '("Time = ",f10.1," seconds.")',finish-start
-	write(*,*) 'Creating observables with uncertainty propagation'
-	call mc_meanstd
-	call cpu_time(finish)
-	print '("Time = ",f10.1," seconds.")',finish-start
+!	write(*,*) 'Creating observables with uncertainty propagation'
+!	call mc_meanstd
+!	call cpu_time(finish)
+!	print '("Time = ",f10.1," seconds.")',finish-start
 	write(*,*) 'Finished all tasks'
 !======================================================================!
 ! End of program
