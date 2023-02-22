@@ -3,7 +3,7 @@
 Details about the physics and formalism behind the codes can be found in our works:
 "Nucleon resonance contributions to unpolarised inclusive electron scattering", A. N. Hiller Blin et al., Phys. Rev. C 100 (2019) 035201, arXiv:1904.08016 [hep-ph]
 "Resonant contributions to inclusive nucleon structure functions from exclusive meson electroproduction data", A. N. Hiller Blin et al., Phys. Rev. C 104 (2021) 025201, arXiv:2105.05834 [hep-ph]
-"Nucleon resonance contributions to unpolarised inclusive electron scattering", A. N. Hiller Blin, V. I. Mokeev, and W. Melnitchouk, arXiv:2212.11952 [hep-ph]
+"Nucleon resonance contributions to unpolarised inclusive electron scattering", A. N. Hiller Blin, V. I. Mokeev, and W. Melnitchouk, arXiv:2212.11952 [hep-ph].
 
 The code can be run with either of the following two options:
 1) gfortran main.f -fcoarray=single
@@ -51,6 +51,4 @@ D) res_samp.dat (incoherent) and resinterf_samp.dat (coherent) are generated. Th
 
 E) From the files generated in D), finally the mean and standard deviation values are computed for the observables and stored in res_meanstd.dat (incoherent) and resinterf_meanstd.dat (coherent).
 
-
- are tables of the contributions of each of the separate 19 resonances to inclusive observables.
-2) sing_res.dat and sing_res_interf.dat are tables for the incoherent and coherent sum of resonance contributions to the inclusive observables, respectively.
+Each generated file is a table of observables vs the proton-virtual-photon center-of-mass energy W (or vs Q^2 in the case of the truncated moments). Please refer to the README file in the Output/ folder for further explanation of these tables.
