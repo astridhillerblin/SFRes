@@ -24,9 +24,6 @@
 	sig1 = 6827*nmc/10000
 !	sig2 = 9545*nmc/10000
 !	sig3 = 9973*nmc/10000
-!======================================================================!
-! From here start the loops for g1 and g2 with interference bands
-!======================================================================!
 	averagef1int = 0.d0
 	averagef2int = 0.d0
 	averageflint = 0.d0
@@ -36,13 +33,19 @@
 	averageh32int = 0.d0
 	averagea1int = 0.d0
 	averagea2int = 0.d0
+! Computations are to be done with and without interferences:
 	open (101,file = 'Output/res_meanstd.dat')
 	open (102,file = 'Output/resinterf_meanstd.dat')
 	do iloop=1,2
+	write (100+iloop,"(19(A10))") "W [GeV]","<F1>","DF1",
+     >	"<F2>","DF2","<FL>","DFL","<g1>","Dg1","<g2>","Dg2",
+     >	"<H1/2>","DH1/2","<H3/2>","DH3/2","<A1>","DA1","<A2>","DA2"
 	do readinit=1,113
 	readwhich=readinit
 	open (201,file='Output/res_samp.dat')
 	open (202,file='Output/resinterf_samp.dat')
+! Reads the sampling files that have been generated.
+! For each value of W, sums over all samples to get the mean:
 	do jloop =1,nmc*113
 	if (modulo(jloop+113-readinit,113).eq.0) then
 	read (200+iloop,*) wmc,
@@ -68,6 +71,7 @@
 	endif
 	enddo
 	close (200+iloop)
+! After the sum has been done, gets the mean:
 	averagef1int=averagef1int/nmc
 	averagef2int=averagef2int/nmc
 	averageflint=averageflint/nmc
@@ -77,6 +81,7 @@
 	averageh32int=averageh32int/nmc
 	averagea1int=averagea1int/nmc
 	averagea2int=averagea2int/nmc
+! Gets the distances between sampling values and mean:
 	do jloop = 1,nmc
 		dismcf1(jloop)=abs(averagef1int-f1intmc(jloop))
 		dismcf2(jloop)=abs(averagef2int-f2intmc(jloop))
@@ -88,6 +93,7 @@
 		dismca1(jloop)=abs(averagea1int-a1intmc(jloop))
 		dismca2(jloop)=abs(averagea2int-a2intmc(jloop))
 	enddo
+! Sorts the sampled observables by their distances to the mean:
 	call hpsort(nmc,dismcf1,f1intmc)
 	call hpsort(nmc,dismcf2,f2intmc)
 	call hpsort(nmc,dismcfl,flintmc)
@@ -97,6 +103,8 @@
 	call hpsort(nmc,dismch32,h32intmc)
 	call hpsort(nmc,dismca1,a1intmc)
 	call hpsort(nmc,dismca2,a2intmc)
+! Stores average and 1-sigma deviation
+! (by getting the element at the sig1-th index):
 	write(100+iloop,"(F10.2,18(F10.4))") wmc,
      >		averagef1int,abs(averagef1int-f1intmc(sig1)),
      >		averagef2int,abs(averagef2int-f2intmc(sig1)),

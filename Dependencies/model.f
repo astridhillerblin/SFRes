@@ -831,9 +831,9 @@
      >		(2.d0*dsqrt(wsq)*pi*alpha*(mres(12)**2-mn**2))/
      >		ghaddel)
         if (plusminus.eq.-1) then
-          gpm0rdel=gpm0rdel*p1232!!!! Corrected (-1.d0)**p1232 to p1232 in May 2022!!
+          gpm0rdel=gpm0rdel*p1232
         else if (plusminus.eq.0) then
-          gpm0rdel=gpm0rdel*p1232/dsqrt(2.d0)!!!! Corrected (-1.d0)**p1232 to p1232 in May 2022!!
+          gpm0rdel=gpm0rdel*p1232/dsqrt(2.d0)
         endif
 	end function gpm0rdel
 !======================================================================!
@@ -849,6 +849,8 @@
 	end function qgam
 !======================================================================!
 ! SUBROUTINE FOR ELECTROCOUPLINGS
+! All the functions, except where explicitly noted, have been fitted to
+! electrocoupling data by E. Isupov.
 !======================================================================!
 	subroutine listecoup(wsq,qsq,listt,listl,listt1,listt2,listl1)
 	use phys_consts
@@ -1017,6 +1019,7 @@
      >		(1.d0+0.455d0*(qsq+0.1d0)**2*dsqrt(qsq+0.1d0))*
      >		(0.4d0-0.24d0/5.d0*(qsq+0.1d0-4.5d0))
 	endif
+! Overall order of magnitude of the units.
 	do ind=1,19
 		listl1(ind) = dsqrt(2.d0)*10.d0**(-3)*listl(ind)
 		listl(ind) = 2.d0*10.d0**(-6)*listl(ind)**2
@@ -1025,6 +1028,9 @@
 		listt2(ind) = 10.d0**(-3)*listt2(ind)
 	enddo
 	kcm = (wsq-mn**2)/(2.d0*dsqrt(wsq))
+! Resonances 8, 13, 14, 19 need to be weighted with other kinematic
+! factors than the rest, to stay consistent with the way they
+! were extracted from data.
 	listl(8) = listl(8)/2.d0*qgam(wsq,qsq)/kcm
 	listl(13) = listl(13)/2.d0*qgam(wsq,qsq)/kcm
 	listl(14) = listl(14)/2.d0*qgam(wsq,qsq)/kcm
@@ -1047,7 +1053,7 @@
 	listl1(19) = listl1(19)*dsqrt(qgam(wsq,qsq)/kcm/2.d0)
 	endsubroutine listecoup
 !======================================================================!
-! SUBROUTINE FOR RANDOM GENERATED ELECTROCOUPLINGS
+! SUBROUTINE FOR USING RANDOMLY GENERATED ELECTROCOUPLINGS
 !======================================================================!
 	subroutine listecoupread(wsq,qsq,listt,listl,listt1,listt2,
      >		listl1)
@@ -1192,6 +1198,8 @@
 	integer lres
 	real(8) bfpi, bf2pi, bfeta
 	real(8) geta, gpi, g2pi
+! The following cases check whether meson production thresholds have
+! already been crossed:
 	if (wsq < (mn + mpi)**2 .or. mres < mn + mpi) then
 		ghad = 0.d0
 	else if (wsq < (mn + 2.d0*mpi)**2 .or. mres < mn+2.d0*mpi) then
