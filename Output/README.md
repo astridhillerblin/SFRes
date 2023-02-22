@@ -1,1 +1,1 @@
-All output files - both for MC sampling, as well as for plotting - will be saved here.
+All output files - both for MC sampling, as well as for final observables - will be saved here.
