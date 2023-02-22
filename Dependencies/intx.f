@@ -1,3 +1,7 @@
+!=====================================================================!
+! This file includes ready-made integration routines used to calculate
+! truncated moments in resonance_files.f
+!=====================================================================!
       SUBROUTINE DSG20R(A,B,N,X,NP)
       IMPLICIT REAL*8 (A-H,O-Z)
       DIMENSION Y(10),X(2000)
@@ -45,30 +49,4 @@
  1    CONTINUE
       CRES=CR*0.5D0*(B-A)/DBLE(N)
       RETURN
-      END       
-*********************************************************************
-C 4 PUNTOS
-         SUBROUTINE STGS4 (XINF,XSUP,Z) 
-	 implicit real*8 (a-h,o-z)  
-         DIMENSION X(2),Z(2) 
-         DATA X/-.8611363115d0,-.3399810435d0/ 
-         DO 10 I=1,2  
-         Z(I)=(XSUP-XINF)*X(I)/2.d0+XSUP/2.d0+XINF/2.d0 
-         L=5-I 
-         Z(L)=(XINF-XSUP)/2.d0*X(I)+(XSUP+XINF)/2.d0 
-  10        CONTINUE   
-         RETURN   
-         END     
-c real functions        
-         SUBROUTINE REGS4 (XINF,XSUP,F,VI) 
-	 implicit real*8 (a-h,o-z)  
-         DIMENSION A(2),F(4) 
-         DATA A/.3478548451d0,.6521451548d0/ 
-         SUM=0.d0
-         DO 10 I=1,2  
-         L=5-I   
-         SUM=SUM+A(I)*(F(I)+F(L)) 
-  10        CONTINUE  
-         VI=SUM*(XSUP-XINF)/2.d0  
-         RETURN  
-         END
+      END    

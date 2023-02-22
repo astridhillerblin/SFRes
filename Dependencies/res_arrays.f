@@ -1,18 +1,39 @@
 !======================================================================!
-! MODULE THAT DECLARES THE RESONANCE ARRAYS: 11 N*'S AND 8 DELTAS
+! MODULE THAT DECLARES THE RESONANCE ARRAYS. THE ORDER IS:
+! 1) N(1440)1/2+
+! 2) N(1520)3/2-
+! 3) N(1535)1/2-
+! 4) N(1650)1/2-
+! 5) N(1675)5/2-
+! 6) N(1680)5/2+
+! 7) N(1710)1/2+
+! 8) N(1720)3/2+
+! 9) Couplings currently set to 0, allows for new resonance in future
+! 10) Couplings currently set to 0, allows for new resonance in future
+! 11) Couplings currently set to 0, allows for new resonance in future
+! 12) Delta(1232)3/2+
+! 13) Delta(1620)1/2-
+! 14) Delta(1700)3/2-
+! 15) Couplings currently set to 0, allows for new resonance in future
+! 16) Couplings currently set to 0, allows for new resonance in future
+! 17) Couplings currently set to 0, allows for new resonance in future
+! 18) Couplings currently set to 0, allows for new resonance in future
+! 19) N'(1720)3/2+
 !======================================================================!
 	module res_decl
 	implicit none
-	real(8), dimension (19) :: mres
-	real(8), dimension (19) :: gres
-	integer, dimension (19) :: lres
-	real(8), dimension (19) :: jres
-	integer, dimension (19) :: parres
-	real(8), dimension (19) :: bfpi
-	real(8), dimension (19) :: bf2pi
-	real(8), dimension (19) :: bfeta
-	real(8), dimension (19) :: xbc
-	character (3), dimension (19) :: spiso
+	real(8), dimension (19) :: mres ! masses
+	real(8), dimension (19) :: gres ! widths
+	integer, dimension (19) :: lres ! angular momenta
+	real(8), dimension (19) :: jres ! spins
+	integer, dimension (19) :: parres ! parities
+	real(8), dimension (19) :: bfpi ! branchings into pi N
+	real(8), dimension (19) :: bf2pi ! branchings into pi pi N
+	real(8), dimension (19) :: bfeta ! branching into eta N
+	real(8), dimension (19) :: xbc ! phenomenological parameter for
+!				energy dependence of hadronic width
+	character (3), dimension (19) :: spiso ! string flags with
+!					spin and isospin
 	end module res_decl
 !======================================================================!
 ! SUBROUTINE THAT EXPLICITLY DECLARES ARRAY ELEMENTS

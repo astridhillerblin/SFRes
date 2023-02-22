@@ -1,10 +1,10 @@
 !     ----------------------------------------
-      module numeros
+      module numbers
         integer, parameter :: ione = 1, itwo = 2, ithree = 3
         real (8), parameter :: zero = 0.d0
         real (8), parameter :: one = 1.d0, two = 2.d0, three = 3.d0,
      +    four = 4.d0, five = 5.d0, six = 6.d0
-      end module numeros
+      end module numbers
 !     ----------------------------------------
 !   resonance info table
 !    1.N(1440)  2.N(1520)   3.N(1535)  4.N(1650)   5.N(1675)
@@ -213,7 +213,7 @@
       end subroutine mcamplitudes
 !     ----------------------------------------
       subroutine readcouplings
-        use numeros
+        use numbers
         use couplingsandinterpolation
         implicit none
         ! internal variables
@@ -365,7 +365,7 @@
 !     interpolating routines
 !     ------------------------------------------------------------------
       SUBROUTINE SPLINE (X,Y,N,YP1,YPN,Y2)
-        use numeros
+        use numbers
         IMPLICIT NONE
         INTEGER, PARAMETER :: NPUNT1 = 701 ! npoints
         INTEGER   :: I,N,K
@@ -400,7 +400,7 @@
       END
 !     ------------------------------------------------------------------
       SUBROUTINE SPLINT (XA,YA,Y2A,N,X,Y)
-        use numeros
+        use numbers
         IMPLICIT NONE
         INTEGER, PARAMETER :: NPUNT1 = 701 ! npoints
         INTEGER  :: N,KLO,KHI,K
