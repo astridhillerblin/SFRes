@@ -14,7 +14,7 @@ chmod 755 compile.sh
 
 When running the code, the following steps happen in order:
 1) The terminal prompts the user to enter a Q^2 value in GeV^2 at which output files should be generated. Please enter the value of choice.
-2) The terminal asks whether truncated moments should be generated (y) or not (n). These observables are integrated over energies and given as functions of the whole range of Q^2. Therefore, it is not necessary to re-generate these files every time, since they will remain the same for any choice in 1). Due to the integrations, the running time is slightly longer and thus it might be of advantage to skip this step most of the time.
+2) The terminal asks whether truncated moments should be generated (y) or not (n). These observables are integrated over energies and given as functions of Q^2 in the range 1 to 3.5 GeV^2. Therefore, it is not necessary to re-generate these files every time, since they will remain the same for any choice in 1). Due to the integrations, the running time is slightly longer and thus it might be of advantage to skip this step most of the time.
 3) The final question is whether the uncertainty propagation should be generated (y or n). This involves generating 10000 Monte-Carlo samples, for which reason a long runtime is expected. Therefore, while for final results one should generate the uncertainties, for tests one should consider skipping this step.
 
 The following output files are then created in the folder Output:
