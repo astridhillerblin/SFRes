@@ -5,6 +5,8 @@ Details about the physics and formalism behind the codes can be found in our wor
 "Resonant contributions to inclusive nucleon structure functions from exclusive meson electroproduction data", A. N. Hiller Blin et al., Phys. Rev. C 104 (2021) 025201, arXiv:2105.05834 [hep-ph]
 "Nucleon resonance contributions to unpolarised inclusive electron scattering", A. N. Hiller Blin, V. I. Mokeev, and W. Melnitchouk, arXiv:2212.11952 [hep-ph].
 
+## Fortran code
+### Includes complete and speedy uncertainty propagation
 The code can be run with either of the following two options:
 1) gfortran main.f -fcoarray=single
 2) ./compile.sh
@@ -52,3 +54,8 @@ D) res_samp.dat (incoherent) and resinterf_samp.dat (coherent) are generated. Th
 E) From the files generated in D), finally the mean and standard deviation values are computed for the observables and stored in res_meanstd.dat (incoherent) and resinterf_meanstd.dat (coherent).
 
 Each generated file is a table of observables vs the proton-virtual-photon center-of-mass energy W (or vs Q^2 in the case of the truncated moments). Please refer to the README file in the Output/ folder for further explanation of these tables.
+
+## Python code
+### Simple visualization, but no uncertainty propagation
+
+The Python file and JupyterNotebook may be halpful to more quickly visualize observables - however, no uncertainty propagration is included, as it would be too slow for the needed MC generation. All observables are created from the central values of the electrocouplings.
