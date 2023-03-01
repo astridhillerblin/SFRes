@@ -58,4 +58,4 @@ Each generated file is a table of observables vs the proton-virtual-photon cente
 ## Python code
 ### Simple visualization, but no uncertainty propagation
 
-The Python folder contains equivalent Python (.py) and JupyterNotebook (.ipynb) codes that may be helpful to more quickly visualize observables - however, no uncertainty propagration is included, as it would be too slow for the needed MC generation. All observables are created from the central values of the electrocouplings.
+The Python folder contains equivalent Python (.py) and JupyterNotebook (.ipynb) codes that may be helpful to more quickly visualize observables - however, no uncertainty propagation is included, as it would be too slow for the needed MC generation. All observables are created from the central values of the electrocouplings.
