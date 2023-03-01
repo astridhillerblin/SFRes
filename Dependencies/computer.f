@@ -54,7 +54,6 @@
      >	g1intmc(readwhich-readinit+1),g2intmc(readwhich-readinit+1),
      >	h12intmc(readwhich-readinit+1),h32intmc(readwhich-readinit+1),
      >	a1intmc(readwhich-readinit+1),a2intmc(readwhich-readinit+1)
-	if (modulo(jloop+112,113).ne.0) then !just because of NaN threshold
 	averagef1int=averagef1int+f1intmc(readwhich-readinit+1)
 	averagef2int=averagef2int+f2intmc(readwhich-readinit+1)
 	averageflint=averageflint+flintmc(readwhich-readinit+1)
@@ -64,7 +63,6 @@
 	averageh32int=averageh32int+h32intmc(readwhich-readinit+1)
 	averagea1int=averagea1int+a1intmc(readwhich-readinit+1)
 	averagea2int=averagea2int+a2intmc(readwhich-readinit+1)
-	endif
 	readwhich=readwhich+1
 	else
 	read(200+iloop,*) bob,bob,bob,bob,bob,bob,bob,bob,bob,bob
