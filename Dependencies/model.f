@@ -1,5 +1,5 @@
 !======================================================================!
-! SUBROUTINE FOR RESONANT CONTRIBUTIONS TO OBSERVABLES
+! SUBROUTINE FOR RESONANT CONTRIBUTIONS TO ALL OBSERVABLES
 !======================================================================!
 	subroutine res_calc(wsq,qsq)
 	use res_decl
@@ -15,16 +15,6 @@
 	real(8), dimension (19) :: flag
         complex(16) gpm0r,gpm0rdel
         complex(16) gpsumsqr,gpwgtsumsqr,gmsumsqr,g0sumsqr
-        complex(16) gpsum12pn,gpwgtsum12pn,gmsum12pn,g0sum12pn
-        complex(16) gpsum32pn,gpwgtsum32pn,gmsum32pn,g0sum32pn
-        complex(16) gpsum52pn,gpwgtsum52pn,gmsum52pn,g0sum52pn
-        complex(16) gpsum12pd,gpwgtsum12pd,gmsum12pd,g0sum12pd
-        complex(16) gpsum32pd,gpwgtsum32pd,gmsum32pd,g0sum32pd
-        complex(16) gpsum12mn,gpwgtsum12mn,gmsum12mn,g0sum12mn
-        complex(16) gpsum32mn,gpwgtsum32mn,gmsum32mn,g0sum32mn
-        complex(16) gpsum52mn,gpwgtsum52mn,gmsum52mn,g0sum52mn
-        complex(16) gpsum12md,gpwgtsum12md,gmsum12md,g0sum12md
-        complex(16) gpsum32md,gpwgtsum32md,gmsum32md,g0sum32md
 	integer ind
 	integer isup
 	real(8) xbj,nu
@@ -34,729 +24,253 @@
 	common/sing/flag
 	common/isupov/isup
 	common/swinterf/interf
+! Bjorken x and nu definitions
 	xbj = qsq/(wsq-mn**2+qsq)
 	nu = (wsq-mn**2+qsq)/(2.d0*mn)
+! Initializes |G+|^2,|G0|^2,|G-|^2,(G+)(G0*)
         gpsumsqr=complex(0.d0,0.d0)
         gpwgtsumsqr=complex(0.d0,0.d0)
         gmsumsqr=complex(0.d0,0.d0)
         g0sumsqr=complex(0.d0,0.d0)
-        gpsum12pn=complex(0.d0,0.d0)
-        gpwgtsum12pn=complex(0.d0,0.d0)
-        gmsum12pn=complex(0.d0,0.d0)
-        g0sum12pn=complex(0.d0,0.d0)
-        gpsum52pn=complex(0.d0,0.d0)
-        gpwgtsum52pn=complex(0.d0,0.d0)
-        gmsum52pn=complex(0.d0,0.d0)
-        g0sum52pn=complex(0.d0,0.d0)
-        gpsum12pd=complex(0.d0,0.d0)
-        gpwgtsum12pd=complex(0.d0,0.d0)
-        gmsum12pd=complex(0.d0,0.d0)
-        g0sum12pd=complex(0.d0,0.d0)
-        gpsum32pd=complex(0.d0,0.d0)
-        gpwgtsum32pd=complex(0.d0,0.d0)
-        gmsum32pd=complex(0.d0,0.d0)
-        g0sum32pd=complex(0.d0,0.d0)
-        gpsum12mn=complex(0.d0,0.d0)
-        gpwgtsum12mn=complex(0.d0,0.d0)
-        gmsum12mn=complex(0.d0,0.d0)
-        g0sum12mn=complex(0.d0,0.d0)
-        gpsum32mn=complex(0.d0,0.d0)
-        gpwgtsum32mn=complex(0.d0,0.d0)
-        gmsum32mn=complex(0.d0,0.d0)
-        g0sum32mn=complex(0.d0,0.d0)
-        gpsum52mn=complex(0.d0,0.d0)
-        gpwgtsum52mn=complex(0.d0,0.d0)
-        gmsum52mn=complex(0.d0,0.d0)
-        g0sum52mn=complex(0.d0,0.d0)
-        gpsum12md=complex(0.d0,0.d0)
-        gpwgtsum12md=complex(0.d0,0.d0)
-        gmsum12md=complex(0.d0,0.d0)
-        g0sum12md=complex(0.d0,0.d0)
-        gpsum32md=complex(0.d0,0.d0)
-        gpwgtsum32md=complex(0.d0,0.d0)
-        gmsum32md=complex(0.d0,0.d0)
-        g0sum32md=complex(0.d0,0.d0)
+! Either call central electrocoupling values, or random MC for uncertainty bands
 	if (isup.eq.0) then
 		call listecoupread(wsq,qsq,coupsqt,coupsql,coupt1,coupt2,coupl)
 	else if (isup.eq.1) then
 		call listecoup(wsq,qsq,coupsqt,coupsql,coupt1,coupt2,coupl)
 	endif
-	do ind=1,11
-		if (spiso(ind).eq."12n".and.parres(ind).eq.1) then
-                gpsum12pn=gpsum12pn+gpm0r(wsq,qsq,gres(ind),mres(ind),
+! Calculates |G+|^2,|G0|^2,|G-|^2,(G+)(G0*) without interferences, by summing over
+! all resonances (except for Delta(1232)3/2+ handled differently right below)
+	do ind=1,19
+	if (ind.ne.12) then
+                gpsumsqr=gpsumsqr+gpm0r(wsq,qsq,gres(ind),mres(ind),
      >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-                gmsum12pn=gmsum12pn+gpm0r(wsq,qsq,gres(ind),mres(ind),
+     >		coupt1(ind),jres(ind),parres(ind),1)*
+     >		conjg(gpm0r(wsq,qsq,gres(ind),mres(ind),
      >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt2(ind),jres(ind),parres(ind),-1)*flag(ind)
-                g0sum12pn=g0sum12pn+gpm0r(wsq,qsq,gres(ind),mres(ind),
+     >		coupt1(ind),jres(ind),parres(ind),1))*flag(ind)
+                gmsumsqr=gmsumsqr+gpm0r(wsq,qsq,gres(ind),mres(ind),
      >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupl(ind),jres(ind),parres(ind),0)*flag(ind)
-                gpwgtsum12pn=gpwgtsum12pn+gpm0r(wsq,qsq,gres(ind),
+     >		coupt2(ind),jres(ind),parres(ind),-1)*
+     >		conjg(gpm0r(wsq,qsq,gres(ind),mres(ind),
+     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
+     >		coupt2(ind),jres(ind),parres(ind),-1))*flag(ind)
+                g0sumsqr=g0sumsqr+gpm0r(wsq,qsq,gres(ind),mres(ind),
+     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
+     >		coupl(ind),jres(ind),parres(ind),0)*
+     >		conjg(gpm0r(wsq,qsq,gres(ind),mres(ind),
+     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
+     >		coupl(ind),jres(ind),parres(ind),0))*flag(ind)
+                gpwgtsumsqr=gpwgtsumsqr+gpm0r(wsq,qsq,gres(ind),
      >			mres(ind),
      >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
      >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-     >			*(-1)**(jres(ind)-0.5d0)*parres(ind)
-		elseif (spiso(ind).eq."32n".and.parres(ind).eq.1) then
-                gpsum32pn=gpsum32pn+gpm0r(wsq,qsq,gres(ind),mres(ind),
+     >			*(-1)**(jres(ind)-0.5d0)*parres(ind)*
+! Note that for the mixed (G+)(G0*) term the above factor is needed,
+! see also Eqs.10 in our work 2212.11952
+     >		conjg(gpm0r(wsq,qsq,gres(ind),mres(ind),
      >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-                gmsum32pn=gmsum32pn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt2(ind),jres(ind),parres(ind),-1)*flag(ind)
-                g0sum32pn=g0sum32pn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupl(ind),jres(ind),parres(ind),0)*flag(ind)
-                gpwgtsum32pn=gpwgtsum32pn+gpm0r(wsq,qsq,gres(ind),
-     >			mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-     >			*(-1)**(jres(ind)-0.5d0)*parres(ind)
-		elseif (spiso(ind).eq."52n".and.parres(ind).eq.1) then
-                gpsum52pn=gpsum52pn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-                gmsum52pn=gmsum52pn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt2(ind),jres(ind),parres(ind),-1)*flag(ind)
-                g0sum52pn=g0sum52pn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupl(ind),jres(ind),parres(ind),0)*flag(ind)
-                gpwgtsum52pn=gpwgtsum52pn+gpm0r(wsq,qsq,gres(ind),
-     >			mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-     >			*(-1)**(jres(ind)-0.5d0)*parres(ind)
-		elseif (spiso(ind).eq."12d".and.parres(ind).eq.1) then
-                gpsum12pd=gpsum12pd+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-                gmsum12pd=gmsum12pd+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt2(ind),jres(ind),parres(ind),-1)*flag(ind)
-                g0sum12pd=g0sum12pd+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupl(ind),jres(ind),parres(ind),0)*flag(ind)
-                gpwgtsum12pd=gpwgtsum12pd+gpm0r(wsq,qsq,gres(ind),
-     >			mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-     >			*(-1)**(jres(ind)-0.5d0)*parres(ind)
-		elseif (spiso(ind).eq."32d".and.parres(ind).eq.1) then
-                gpsum32pd=gpsum32pd+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-                gmsum32pd=gmsum32pd+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt2(ind),jres(ind),parres(ind),-1)*flag(ind)
-                g0sum32pd=g0sum32pd+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupl(ind),jres(ind),parres(ind),0)*flag(ind)
-                gpwgtsum32pd=gpwgtsum32pd+gpm0r(wsq,qsq,gres(ind),
-     >			mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-     >			*(-1)**(jres(ind)-0.5d0)*parres(ind)
-		elseif (spiso(ind).eq."12n".and.parres(ind).eq.-1) then
-                gpsum12mn=gpsum12mn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-                gmsum12mn=gmsum12mn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt2(ind),jres(ind),parres(ind),-1)*flag(ind)
-                g0sum12mn=g0sum12mn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupl(ind),jres(ind),parres(ind),0)*flag(ind)
-                gpwgtsum12mn=gpwgtsum12mn+gpm0r(wsq,qsq,gres(ind),
-     >			mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-     >			*(-1)**(jres(ind)-0.5d0)*parres(ind)
-		elseif (spiso(ind).eq."32n".and.parres(ind).eq.-1) then
-                gpsum32mn=gpsum32mn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-                gmsum32mn=gmsum32mn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt2(ind),jres(ind),parres(ind),-1)*flag(ind)
-                g0sum32mn=g0sum32mn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupl(ind),jres(ind),parres(ind),0)*flag(ind)
-                gpwgtsum32mn=gpwgtsum32mn+gpm0r(wsq,qsq,gres(ind),
-     >			mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-     >			*(-1)**(jres(ind)-0.5d0)*parres(ind)
-		elseif (spiso(ind).eq."52n".and.parres(ind).eq.-1) then
-                gpsum52mn=gpsum52mn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-                gmsum52mn=gmsum52mn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt2(ind),jres(ind),parres(ind),-1)*flag(ind)
-                g0sum52mn=g0sum52mn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupl(ind),jres(ind),parres(ind),0)*flag(ind)
-                gpwgtsum52mn=gpwgtsum52mn+gpm0r(wsq,qsq,gres(ind),
-     >			mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-     >			*(-1)**(jres(ind)-0.5d0)*parres(ind)
-		elseif (spiso(ind).eq."12d".and.parres(ind).eq.-1) then
-                gpsum12md=gpsum12md+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-                gmsum12md=gmsum12md+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt2(ind),jres(ind),parres(ind),-1)*flag(ind)
-                g0sum12md=g0sum12md+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupl(ind),jres(ind),parres(ind),0)*flag(ind)
-                gpwgtsum12md=gpwgtsum12md+gpm0r(wsq,qsq,gres(ind),
-     >			mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-     >			*(-1)**(jres(ind)-0.5d0)*parres(ind)
-		elseif (spiso(ind).eq."32d".and.parres(ind).eq.-1) then
-                gpsum32md=gpsum32md+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-                gmsum32md=gmsum32md+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt2(ind),jres(ind),parres(ind),-1)*flag(ind)
-                g0sum32md=g0sum32md+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupl(ind),jres(ind),parres(ind),0)*flag(ind)
-                gpwgtsum32md=gpwgtsum32md+gpm0r(wsq,qsq,gres(ind),
-     >			mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-     >			*(-1)**(jres(ind)-0.5d0)*parres(ind)
-		endif
+     >		coupl(ind),jres(ind),parres(ind),0))
+	endif
 	enddo
-        gpsum32pd=gpsum32pd+gpm0rdel(wsq,qsq,coupt1(12),1)*flag(12)
-        gmsum32pd=gmsum32pd+gpm0rdel(wsq,qsq,coupt2(12),-1)*flag(12)
-        g0sum32pd=g0sum32pd+gpm0rdel(wsq,qsq,coupl(12),0)*flag(12)
-        gpwgtsum32pd=gpwgtsum32pd+gpm0rdel(wsq,qsq,coupt1(12),1)
-     >			*flag(12)*(-1)**(jres(ind)-0.5d0)*parres(ind)
-	do ind=13,19
-		if (spiso(ind).eq."12n".and.parres(ind).eq.1) then
-                gpsum12pn=gpsum12pn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-                gmsum12pn=gmsum12pn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt2(ind),jres(ind),parres(ind),-1)*flag(ind)
-                g0sum12pn=g0sum12pn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupl(ind),jres(ind),parres(ind),0)*flag(ind)
-                gpwgtsum12pn=gpwgtsum12pn+gpm0r(wsq,qsq,gres(ind),
-     >			mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-     >			*(-1)**(jres(ind)-0.5d0)*parres(ind)
-		elseif (spiso(ind).eq."32n".and.parres(ind).eq.1) then
-                gpsum32pn=gpsum32pn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-                gmsum32pn=gmsum32pn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt2(ind),jres(ind),parres(ind),-1)*flag(ind)
-                g0sum32pn=g0sum32pn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupl(ind),jres(ind),parres(ind),0)*flag(ind)
-                gpwgtsum32pn=gpwgtsum32pn+gpm0r(wsq,qsq,gres(ind),
-     >			mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-     >			*(-1)**(jres(ind)-0.5d0)*parres(ind)
-		elseif (spiso(ind).eq."52n".and.parres(ind).eq.1) then
-                gpsum52pn=gpsum52pn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-                gmsum52pn=gmsum52pn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt2(ind),jres(ind),parres(ind),-1)*flag(ind)
-                g0sum52pn=g0sum52pn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupl(ind),jres(ind),parres(ind),0)*flag(ind)
-                gpwgtsum52pn=gpwgtsum52pn+gpm0r(wsq,qsq,gres(ind),
-     >			mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-     >			*(-1)**(jres(ind)-0.5d0)*parres(ind)
-		elseif (spiso(ind).eq."12d".and.parres(ind).eq.1) then
-                gpsum12pd=gpsum12pd+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-                gmsum12pd=gmsum12pd+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt2(ind),jres(ind),parres(ind),-1)*flag(ind)
-                g0sum12pd=g0sum12pd+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupl(ind),jres(ind),parres(ind),0)*flag(ind)
-                gpwgtsum12pd=gpwgtsum12pd+gpm0r(wsq,qsq,gres(ind),
-     >			mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-     >			*(-1)**(jres(ind)-0.5d0)*parres(ind)
-		elseif (spiso(ind).eq."32d".and.parres(ind).eq.1) then
-                gpsum32pd=gpsum32pd+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-                gmsum32pd=gmsum32pd+gpm0r(wsq,qsq,gres(ind),
-     >			mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt2(ind),jres(ind),parres(ind),-1)*flag(ind)
-                g0sum32pd=g0sum32pd+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupl(ind),jres(ind),parres(ind),0)*flag(ind)
-                gpwgtsum32pd=gpwgtsum32pd+gpm0r(wsq,qsq,gres(ind),
-     >			mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-     >			*(-1)**(jres(ind)-0.5d0)*parres(ind)
-		elseif (spiso(ind).eq."12n".and.parres(ind).eq.-1) then
-                gpsum12mn=gpsum12mn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-                gmsum12mn=gmsum12mn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt2(ind),jres(ind),parres(ind),-1)*flag(ind)
-                g0sum12mn=g0sum12mn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupl(ind),jres(ind),parres(ind),0)*flag(ind)
-                gpwgtsum12mn=gpwgtsum12mn+gpm0r(wsq,qsq,gres(ind),
-     >			mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-     >			*(-1)**(jres(ind)-0.5d0)*parres(ind)
-		elseif (spiso(ind).eq."32n".and.parres(ind).eq.-1) then
-                gpsum32mn=gpsum32mn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-                gmsum32mn=gmsum32mn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt2(ind),jres(ind),parres(ind),-1)*flag(ind)
-                g0sum32mn=g0sum32mn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupl(ind),jres(ind),parres(ind),0)*flag(ind)
-                gpwgtsum32mn=gpwgtsum32mn+gpm0r(wsq,qsq,gres(ind),
-     >			mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-     >			*(-1)**(jres(ind)-0.5d0)*parres(ind)
-		elseif (spiso(ind).eq."52n".and.parres(ind).eq.-1) then
-                gpsum52mn=gpsum52mn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-                gmsum52mn=gmsum52mn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt2(ind),jres(ind),parres(ind),-1)*flag(ind)
-                g0sum52mn=g0sum52mn+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupl(ind),jres(ind),parres(ind),0)*flag(ind)
-                gpwgtsum52mn=gpwgtsum52mn+gpm0r(wsq,qsq,gres(ind),
-     >			mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-     >			*(-1)**(jres(ind)-0.5d0)*parres(ind)
-		elseif (spiso(ind).eq."12d".and.parres(ind).eq.-1) then
-                gpsum12md=gpsum12md+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-                gmsum12md=gmsum12md+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt2(ind),jres(ind),parres(ind),-1)*flag(ind)
-                g0sum12md=g0sum12md+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupl(ind),jres(ind),parres(ind),0)*flag(ind)
-                gpwgtsum12md=gpwgtsum12md+gpm0r(wsq,qsq,gres(ind),
-     >			mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-     >			*(-1)**(jres(ind)-0.5d0)*parres(ind)
-		elseif (spiso(ind).eq."32d".and.parres(ind).eq.-1) then
-                gpsum32md=gpsum32md+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-                gmsum32md=gmsum32md+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt2(ind),jres(ind),parres(ind),-1)*flag(ind)
-                g0sum32md=g0sum32md+gpm0r(wsq,qsq,gres(ind),mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupl(ind),jres(ind),parres(ind),0)*flag(ind)
-                gpwgtsum32md=gpwgtsum32md+gpm0r(wsq,qsq,gres(ind),
-     >			mres(ind),
-     >		xbc(ind),lres(ind),bfpi(ind),bf2pi(ind),bfeta(ind),
-     >		coupt1(ind),jres(ind),parres(ind),1)*flag(ind)
-     >			*(-1)**(jres(ind)-0.5d0)*parres(ind)
-		endif
-	enddo
+! The Delta contributions are handled here
+! The reason for separating them is due to the different treatment of 
+! the hadronic decay width 
+        gpsumsqr=gpsumsqr+gpm0rdel(wsq,qsq,coupt1(12),1)*
+     >		conjg(gpm0rdel(wsq,qsq,coupt1(12),1))*flag(12)
+        gmsumsqr=gmsumsqr+gpm0rdel(wsq,qsq,coupt2(12),-1)*
+     >		conjg(gpm0rdel(wsq,qsq,coupt2(12),-1))*flag(12)
+        g0sumsqr=g0sumsqr+gpm0rdel(wsq,qsq,coupl(12),0)*
+     >		conjg(gpm0rdel(wsq,qsq,coupl(12),0))*flag(12)
+        gpwgtsumsqr=gpwgtsumsqr+gpm0rdel(wsq,qsq,coupt1(12),1)
+     >			*flag(12)*(-1)**(jres(12)-0.5d0)*parres(12)*
+     >		conjg(gpm0rdel(wsq,qsq,coupl(12),0))
 !======================================================================!
-! Note that for all the sums squared the interference between N(1720)
-! and N'(1720) is taken into account differently, by reducing their
-! interference by a factor 1.72. This is done by removing the 32pn
-! sum above and handling it differently below!
+! Now the interference terms are included.
+! This is done by taking into account the interferences between 
+! resonances with the same quantum numbers.
+! Ultimately, this affects the interference between:
+! 1) N(1720)3/2+ and N'(1720)3/2+ (indices 8 and 19)
+! 1) N(1440)1/2+ and N(1710)1/2+ (indices 1 and 7)
+! 1) N(1535)1/2- and N(1650)1/2+ (indices 3 and 4)
+! Note also that the interference between N(1720) and N'(1720)
+! is taken into account differently than the ohers, by reducing their
+! interference by a factor 1.72.
 !======================================================================!
-	gpsumsqr=!gpsum12pn*conjg(gpsum12pn)+
-!     >		gpsum32pn*conjg(gpsum32pn)+
-     >		gpsum52pn*conjg(gpsum52pn)+gpsum12pd*conjg(gpsum12pd)+
-     >		gpsum32pd*conjg(gpsum32pd)+
-!     >		gpsum12mn*conjg(gpsum12mn)+
-     >		gpsum32mn*conjg(gpsum32mn)+
-     >		gpsum52mn*conjg(gpsum52mn)+gpsum12md*conjg(gpsum12md)+
-     >		gpsum32md*conjg(gpsum32md)
-        gpsumsqr=gpsumsqr+gpm0r(wsq,qsq,gres(8),mres(8),
-     >		xbc(8),lres(8),bfpi(8),bf2pi(8),bfeta(8),
-     >		coupt1(8),jres(8),parres(8),1)*
-     >		conjg(gpm0r(wsq,qsq,gres(8),mres(8),
-     >		xbc(8),lres(8),bfpi(8),bf2pi(8),bfeta(8),
-     >		coupt1(8),jres(8),parres(8),1))*flag(8)
-     >		+gpm0r(wsq,qsq,gres(19),mres(19),
-     >		xbc(19),lres(19),bfpi(19),bf2pi(19),bfeta(19),
-     >		coupt1(19),jres(19),parres(19),1)*
-     >		conjg(gpm0r(wsq,qsq,gres(19),mres(19),
-     >		xbc(19),lres(19),bfpi(19),bf2pi(19),bfeta(19),
-     >		coupt1(19),jres(19),parres(19),1))*flag(19)
-     >		+1.d0/1.72d0*gpm0r(wsq,qsq,gres(8),mres(8),
+! As explained just above, interference terms in |G+|^2:
+        gpsumsqr=gpsumsqr+interf*(
+     >		(gpm0r(wsq,qsq,gres(8),mres(8),
      >		xbc(8),lres(8),bfpi(8),bf2pi(8),bfeta(8),
      >		coupt1(8),jres(8),parres(8),1)*
      >		conjg(gpm0r(wsq,qsq,gres(19),mres(19),
      >		xbc(19),lres(19),bfpi(19),bf2pi(19),bfeta(19),
-     >		coupt1(19),jres(19),parres(19),1))*flag(19)*flag(8)
-     >		*interf
-     >		+1.d0/1.72d0*conjg(gpm0r(wsq,qsq,gres(8),mres(8),
+     >		coupt1(19),jres(19),parres(19),1))
+     >		+conjg(gpm0r(wsq,qsq,gres(8),mres(8),
      >		xbc(8),lres(8),bfpi(8),bf2pi(8),bfeta(8),
      >		coupt1(8),jres(8),parres(8),1))*
      >		gpm0r(wsq,qsq,gres(19),mres(19),
      >		xbc(19),lres(19),bfpi(19),bf2pi(19),bfeta(19),
-     >		coupt1(19),jres(19),parres(19),1)*flag(19)*flag(8)
-     >		*interf
-        gpsumsqr=gpsumsqr+gpm0r(wsq,qsq,gres(1),mres(1),
-     >		xbc(1),lres(1),bfpi(1),bf2pi(1),bfeta(1),
-     >		coupt1(1),jres(1),parres(1),1)*
-     >		conjg(gpm0r(wsq,qsq,gres(1),mres(1),
-     >		xbc(1),lres(1),bfpi(1),bf2pi(1),bfeta(1),
-     >		coupt1(1),jres(1),parres(1),1))*flag(1)
-     >		+gpm0r(wsq,qsq,gres(7),mres(7),
-     >		xbc(7),lres(7),bfpi(7),bf2pi(7),bfeta(7),
-     >		coupt1(7),jres(7),parres(7),1)*
-     >		conjg(gpm0r(wsq,qsq,gres(7),mres(7),
-     >		xbc(7),lres(7),bfpi(7),bf2pi(7),bfeta(7),
-     >		coupt1(7),jres(7),parres(7),1))*flag(7)
-     >		+gpm0r(wsq,qsq,gres(1),mres(1),
+     >		coupt1(19),jres(19),parres(19),1))
+     >		*flag(19)*flag(8)/1.72d0+
+     >		(gpm0r(wsq,qsq,gres(1),mres(1),
      >		xbc(1),lres(1),bfpi(1),bf2pi(1),bfeta(1),
      >		coupt1(1),jres(1),parres(1),1)*
      >		conjg(gpm0r(wsq,qsq,gres(7),mres(7),
      >		xbc(7),lres(7),bfpi(7),bf2pi(7),bfeta(7),
-     >		coupt1(7),jres(7),parres(7),1))*flag(7)*flag(1)
-     >		*interf
+     >		coupt1(7),jres(7),parres(7),1))
      >		+conjg(gpm0r(wsq,qsq,gres(1),mres(1),
      >		xbc(1),lres(1),bfpi(1),bf2pi(1),bfeta(1),
      >		coupt1(1),jres(1),parres(1),1))*
      >		gpm0r(wsq,qsq,gres(7),mres(7),
      >		xbc(7),lres(7),bfpi(7),bf2pi(7),bfeta(7),
-     >		coupt1(7),jres(7),parres(7),1)*flag(7)*flag(1)
-     >		*interf
-        gpsumsqr=gpsumsqr+gpm0r(wsq,qsq,gres(3),mres(3),
-     >		xbc(3),lres(3),bfpi(3),bf2pi(3),bfeta(3),
-     >		coupt1(3),jres(3),parres(3),1)*
-     >		conjg(gpm0r(wsq,qsq,gres(3),mres(3),
-     >		xbc(3),lres(3),bfpi(3),bf2pi(3),bfeta(3),
-     >		coupt1(3),jres(3),parres(3),1))*flag(3)
-     >		+gpm0r(wsq,qsq,gres(4),mres(4),
-     >		xbc(4),lres(4),bfpi(4),bf2pi(4),bfeta(4),
-     >		coupt1(4),jres(4),parres(4),1)*
-     >		conjg(gpm0r(wsq,qsq,gres(4),mres(4),
-     >		xbc(4),lres(4),bfpi(4),bf2pi(4),bfeta(4),
-     >		coupt1(4),jres(4),parres(4),1))*flag(4)
-     >		+gpm0r(wsq,qsq,gres(3),mres(3),
+     >		coupt1(7),jres(7),parres(7),1))
+     >		*flag(7)*flag(1)+
+     >		(gpm0r(wsq,qsq,gres(3),mres(3),
      >		xbc(3),lres(3),bfpi(3),bf2pi(3),bfeta(3),
      >		coupt1(3),jres(3),parres(3),1)*
      >		conjg(gpm0r(wsq,qsq,gres(4),mres(4),
      >		xbc(4),lres(4),bfpi(4),bf2pi(4),bfeta(4),
-     >		coupt1(4),jres(4),parres(4),1))*flag(4)*flag(3)
-     >		*interf
+     >		coupt1(4),jres(4),parres(4),1))
      >		+conjg(gpm0r(wsq,qsq,gres(3),mres(3),
      >		xbc(3),lres(3),bfpi(3),bf2pi(3),bfeta(3),
      >		coupt1(3),jres(3),parres(3),1))*
      >		gpm0r(wsq,qsq,gres(4),mres(4),
      >		xbc(4),lres(4),bfpi(4),bf2pi(4),bfeta(4),
-     >		coupt1(4),jres(4),parres(4),1)*flag(4)*flag(3)
-     >		*interf
-	gmsumsqr=!gmsum12pn*conjg(gmsum12pn)+
-!     >		gmsum32pn*conjg(gmsum32pn)+
-     >		gmsum52pn*conjg(gmsum52pn)+gmsum12pd*conjg(gmsum12pd)+
-     >		gmsum32pd*conjg(gmsum32pd)+
-!     >		gmsum12mn*conjg(gmsum12mn)+
-     >		gmsum32mn*conjg(gmsum32mn)+
-     >		gmsum52mn*conjg(gmsum52mn)+gmsum12md*conjg(gmsum12md)+
-     >		gmsum32md*conjg(gmsum32md)
-        gmsumsqr=gmsumsqr+gpm0r(wsq,qsq,gres(8),mres(8),
-     >		xbc(8),lres(8),bfpi(8),bf2pi(8),bfeta(8),
-     >		coupt2(8),jres(8),parres(8),-1)*
-     >		conjg(gpm0r(wsq,qsq,gres(8),mres(8),
-     >		xbc(8),lres(8),bfpi(8),bf2pi(8),bfeta(8),
-     >		coupt2(8),jres(8),parres(8),-1))*flag(8)
-     >		+gpm0r(wsq,qsq,gres(19),mres(19),
-     >		xbc(19),lres(19),bfpi(19),bf2pi(19),bfeta(19),
-     >		coupt2(19),jres(19),parres(19),-1)*
-     >		conjg(gpm0r(wsq,qsq,gres(19),mres(19),
-     >		xbc(19),lres(19),bfpi(19),bf2pi(19),bfeta(19),
-     >		coupt2(19),jres(19),parres(19),-1))*flag(19)
-     >		+1.d0/1.72d0*gpm0r(wsq,qsq,gres(8),mres(8),
+     >		coupt1(4),jres(4),parres(4),1))
+     >		*flag(3)*flag(4)
+     >		)
+! As explained above, interference terms in |G-|^2:
+        gmsumsqr=gmsumsqr+interf*(
+     >		(gpm0r(wsq,qsq,gres(8),mres(8),
      >		xbc(8),lres(8),bfpi(8),bf2pi(8),bfeta(8),
      >		coupt2(8),jres(8),parres(8),-1)*
      >		conjg(gpm0r(wsq,qsq,gres(19),mres(19),
      >		xbc(19),lres(19),bfpi(19),bf2pi(19),bfeta(19),
-     >		coupt2(19),jres(19),parres(19),-1))*flag(19)*flag(8)
-     >		*interf
-     >		+1.d0/1.72d0*conjg(gpm0r(wsq,qsq,gres(8),mres(8),
+     >		coupt2(19),jres(19),parres(19),-1))
+     >		+conjg(gpm0r(wsq,qsq,gres(8),mres(8),
      >		xbc(8),lres(8),bfpi(8),bf2pi(8),bfeta(8),
      >		coupt2(8),jres(8),parres(8),-1))*
      >		gpm0r(wsq,qsq,gres(19),mres(19),
      >		xbc(19),lres(19),bfpi(19),bf2pi(19),bfeta(19),
-     >		coupt2(19),jres(19),parres(19),-1)*flag(19)*flag(8)
-     >		*interf
-        gmsumsqr=gmsumsqr+gpm0r(wsq,qsq,gres(1),mres(1),
-     >		xbc(1),lres(1),bfpi(1),bf2pi(1),bfeta(1),
-     >		coupt2(1),jres(1),parres(1),-1)*
-     >		conjg(gpm0r(wsq,qsq,gres(1),mres(1),
-     >		xbc(1),lres(1),bfpi(1),bf2pi(1),bfeta(1),
-     >		coupt2(1),jres(1),parres(1),-1))*flag(1)
-     >		+gpm0r(wsq,qsq,gres(7),mres(7),
-     >		xbc(7),lres(7),bfpi(7),bf2pi(7),bfeta(7),
-     >		coupt2(7),jres(7),parres(7),-1)*
-     >		conjg(gpm0r(wsq,qsq,gres(7),mres(7),
-     >		xbc(7),lres(7),bfpi(7),bf2pi(7),bfeta(7),
-     >		coupt2(7),jres(7),parres(7),-1))*flag(7)
-     >		+gpm0r(wsq,qsq,gres(1),mres(1),
+     >		coupt2(19),jres(19),parres(19),-1))
+     >		*flag(19)*flag(8)/1.72d0+
+     >		(gpm0r(wsq,qsq,gres(1),mres(1),
      >		xbc(1),lres(1),bfpi(1),bf2pi(1),bfeta(1),
      >		coupt2(1),jres(1),parres(1),-1)*
      >		conjg(gpm0r(wsq,qsq,gres(7),mres(7),
      >		xbc(7),lres(7),bfpi(7),bf2pi(7),bfeta(7),
-     >		coupt2(7),jres(7),parres(7),-1))*flag(7)*flag(1)
-     >		*interf
+     >		coupt2(7),jres(7),parres(7),-1))
      >		+conjg(gpm0r(wsq,qsq,gres(1),mres(1),
      >		xbc(1),lres(1),bfpi(1),bf2pi(1),bfeta(1),
      >		coupt2(1),jres(1),parres(1),-1))*
      >		gpm0r(wsq,qsq,gres(7),mres(7),
      >		xbc(7),lres(7),bfpi(7),bf2pi(7),bfeta(7),
-     >		coupt2(7),jres(7),parres(7),-1)*flag(7)*flag(1)
-     >		*interf
-        gmsumsqr=gmsumsqr+gpm0r(wsq,qsq,gres(3),mres(3),
-     >		xbc(3),lres(3),bfpi(3),bf2pi(3),bfeta(3),
-     >		coupt2(3),jres(3),parres(3),-1)*
-     >		conjg(gpm0r(wsq,qsq,gres(3),mres(3),
-     >		xbc(3),lres(3),bfpi(3),bf2pi(3),bfeta(3),
-     >		coupt2(3),jres(3),parres(3),-1))*flag(3)
-     >		+gpm0r(wsq,qsq,gres(4),mres(4),
-     >		xbc(4),lres(4),bfpi(4),bf2pi(4),bfeta(4),
-     >		coupt2(4),jres(4),parres(4),-1)*
-     >		conjg(gpm0r(wsq,qsq,gres(4),mres(4),
-     >		xbc(4),lres(4),bfpi(4),bf2pi(4),bfeta(4),
-     >		coupt2(4),jres(4),parres(4),-1))*flag(4)
-     >		+gpm0r(wsq,qsq,gres(3),mres(3),
+     >		coupt2(7),jres(7),parres(7),-1))
+     >		*flag(7)*flag(1)+
+     >		(gpm0r(wsq,qsq,gres(3),mres(3),
      >		xbc(3),lres(3),bfpi(3),bf2pi(3),bfeta(3),
      >		coupt2(3),jres(3),parres(3),-1)*
      >		conjg(gpm0r(wsq,qsq,gres(4),mres(4),
      >		xbc(4),lres(4),bfpi(4),bf2pi(4),bfeta(4),
-     >		coupt2(4),jres(4),parres(4),-1))*flag(4)*flag(3)
-     >		*interf
+     >		coupt2(4),jres(4),parres(4),-1))
      >		+conjg(gpm0r(wsq,qsq,gres(3),mres(3),
      >		xbc(3),lres(3),bfpi(3),bf2pi(3),bfeta(3),
      >		coupt2(3),jres(3),parres(3),-1))*
      >		gpm0r(wsq,qsq,gres(4),mres(4),
      >		xbc(4),lres(4),bfpi(4),bf2pi(4),bfeta(4),
-     >		coupt2(4),jres(4),parres(4),-1)*flag(4)*flag(3)
-     >		*interf
-	g0sumsqr=!g0sum12pn*conjg(g0sum12pn)+
-!     >		g0sum32pn*conjg(g0sum32pn)+
-     >		g0sum52pn*conjg(g0sum52pn)+g0sum12pd*conjg(g0sum12pd)+
-     >		g0sum32pd*conjg(g0sum32pd)+
-!     >		g0sum12mn*conjg(g0sum12mn)+
-     >		g0sum32mn*conjg(g0sum32mn)+
-     >		g0sum52mn*conjg(g0sum52mn)+g0sum12md*conjg(g0sum12md)+
-     >		g0sum32md*conjg(g0sum32md)
-        g0sumsqr=g0sumsqr+gpm0r(wsq,qsq,gres(8),mres(8),
-     >		xbc(8),lres(8),bfpi(8),bf2pi(8),bfeta(8),
-     >		coupl(8),jres(8),parres(8),0)*
-     >		conjg(gpm0r(wsq,qsq,gres(8),mres(8),
-     >		xbc(8),lres(8),bfpi(8),bf2pi(8),bfeta(8),
-     >		coupl(8),jres(8),parres(8),0))*flag(8)
-     >		+gpm0r(wsq,qsq,gres(19),mres(19),
-     >		xbc(19),lres(19),bfpi(19),bf2pi(19),bfeta(19),
-     >		coupl(19),jres(19),parres(19),0)*
-     >		conjg(gpm0r(wsq,qsq,gres(19),mres(19),
-     >		xbc(19),lres(19),bfpi(19),bf2pi(19),bfeta(19),
-     >		coupl(19),jres(19),parres(19),0))*flag(19)
-     >		+1.d0/1.72d0*gpm0r(wsq,qsq,gres(8),mres(8),
+     >		coupt2(4),jres(4),parres(4),-1))
+     >		*flag(3)*flag(4)
+     >		)
+! As explained above, interference terms in |G0|^2:
+        g0sumsqr=g0sumsqr+interf*(
+     >		(gpm0r(wsq,qsq,gres(8),mres(8),
      >		xbc(8),lres(8),bfpi(8),bf2pi(8),bfeta(8),
      >		coupl(8),jres(8),parres(8),0)*
      >		conjg(gpm0r(wsq,qsq,gres(19),mres(19),
      >		xbc(19),lres(19),bfpi(19),bf2pi(19),bfeta(19),
-     >		coupl(19),jres(19),parres(19),0))*flag(19)*flag(8)
-     >		*interf
-     >		+1.d0/1.72d0*conjg(gpm0r(wsq,qsq,gres(8),mres(8),
+     >		coupl(19),jres(19),parres(19),0))
+     >		+conjg(gpm0r(wsq,qsq,gres(8),mres(8),
      >		xbc(8),lres(8),bfpi(8),bf2pi(8),bfeta(8),
      >		coupl(8),jres(8),parres(8),0))*
      >		gpm0r(wsq,qsq,gres(19),mres(19),
      >		xbc(19),lres(19),bfpi(19),bf2pi(19),bfeta(19),
-     >		coupl(19),jres(19),parres(19),0)*flag(19)*flag(8)
-     >		*interf
-        g0sumsqr=g0sumsqr+gpm0r(wsq,qsq,gres(1),mres(1),
-     >		xbc(1),lres(1),bfpi(1),bf2pi(1),bfeta(1),
-     >		coupl(1),jres(1),parres(1),0)*
-     >		conjg(gpm0r(wsq,qsq,gres(1),mres(1),
-     >		xbc(1),lres(1),bfpi(1),bf2pi(1),bfeta(1),
-     >		coupl(1),jres(1),parres(1),0))*flag(1)
-     >		+gpm0r(wsq,qsq,gres(7),mres(7),
-     >		xbc(7),lres(7),bfpi(7),bf2pi(7),bfeta(7),
-     >		coupl(7),jres(7),parres(7),0)*
-     >		conjg(gpm0r(wsq,qsq,gres(7),mres(7),
-     >		xbc(7),lres(7),bfpi(7),bf2pi(7),bfeta(7),
-     >		coupl(7),jres(7),parres(7),0))*flag(7)
-     >		+gpm0r(wsq,qsq,gres(1),mres(1),
+     >		coupl(19),jres(19),parres(19),0))
+     >		*flag(19)*flag(8)/1.72d0+
+     >		(gpm0r(wsq,qsq,gres(1),mres(1),
      >		xbc(1),lres(1),bfpi(1),bf2pi(1),bfeta(1),
      >		coupl(1),jres(1),parres(1),0)*
      >		conjg(gpm0r(wsq,qsq,gres(7),mres(7),
      >		xbc(7),lres(7),bfpi(7),bf2pi(7),bfeta(7),
-     >		coupl(7),jres(7),parres(7),0))*flag(7)*flag(1)
-     >		*interf
+     >		coupl(7),jres(7),parres(7),0))
      >		+conjg(gpm0r(wsq,qsq,gres(1),mres(1),
      >		xbc(1),lres(1),bfpi(1),bf2pi(1),bfeta(1),
      >		coupl(1),jres(1),parres(1),0))*
      >		gpm0r(wsq,qsq,gres(7),mres(7),
      >		xbc(7),lres(7),bfpi(7),bf2pi(7),bfeta(7),
-     >		coupl(7),jres(7),parres(7),0)*flag(7)*flag(1)
-     >		*interf
-        g0sumsqr=g0sumsqr+gpm0r(wsq,qsq,gres(3),mres(3),
-     >		xbc(3),lres(3),bfpi(3),bf2pi(3),bfeta(3),
-     >		coupl(3),jres(3),parres(3),0)*
-     >		conjg(gpm0r(wsq,qsq,gres(3),mres(3),
-     >		xbc(3),lres(3),bfpi(3),bf2pi(3),bfeta(3),
-     >		coupl(3),jres(3),parres(3),0))*flag(3)
-     >		+gpm0r(wsq,qsq,gres(4),mres(4),
-     >		xbc(4),lres(4),bfpi(4),bf2pi(4),bfeta(4),
-     >		coupl(4),jres(4),parres(4),0)*
-     >		conjg(gpm0r(wsq,qsq,gres(4),mres(4),
-     >		xbc(4),lres(4),bfpi(4),bf2pi(4),bfeta(4),
-     >		coupl(4),jres(4),parres(4),0))*flag(4)
-     >		+gpm0r(wsq,qsq,gres(3),mres(3),
+     >		coupl(7),jres(7),parres(7),0))
+     >		*flag(7)*flag(1)+
+     >		(gpm0r(wsq,qsq,gres(3),mres(3),
      >		xbc(3),lres(3),bfpi(3),bf2pi(3),bfeta(3),
      >		coupl(3),jres(3),parres(3),0)*
      >		conjg(gpm0r(wsq,qsq,gres(4),mres(4),
      >		xbc(4),lres(4),bfpi(4),bf2pi(4),bfeta(4),
-     >		coupl(4),jres(4),parres(4),0))*flag(4)*flag(3)
-     >		*interf
+     >		coupl(4),jres(4),parres(4),0))
      >		+conjg(gpm0r(wsq,qsq,gres(3),mres(3),
      >		xbc(3),lres(3),bfpi(3),bf2pi(3),bfeta(3),
      >		coupl(3),jres(3),parres(3),0))*
      >		gpm0r(wsq,qsq,gres(4),mres(4),
      >		xbc(4),lres(4),bfpi(4),bf2pi(4),bfeta(4),
-     >		coupl(4),jres(4),parres(4),0)*flag(4)*flag(3)
-     >		*interf
-	gpwgtsumsqr=!gpwgtsum12pn*conjg(g0sum12pn)+
-!     >		gpwgtsum32pn*conjg(g0sum32pn)+
-     >		gpwgtsum52pn*conjg(g0sum52pn)+
-     >		gpwgtsum12pd*conjg(g0sum12pd)+
-     >		gpwgtsum32pd*conjg(g0sum32pd)+
-!     >		gpwgtsum12mn*conjg(g0sum12mn)+
-     >		gpwgtsum32mn*conjg(g0sum32mn)+
-     >		gpwgtsum52mn*conjg(g0sum52mn)+
-     >		gpwgtsum12md*conjg(g0sum12md)+
-     >		gpwgtsum32md*conjg(g0sum32md)
-        gpwgtsumsqr=gpwgtsumsqr+gpm0r(wsq,qsq,gres(8),mres(8),
-     >		xbc(8),lres(8),bfpi(8),bf2pi(8),bfeta(8),
-     >		coupt1(8),jres(8),parres(8),1)*
-     >		(-1)**(jres(8)-0.5d0)*parres(8)*
-     >		conjg(gpm0r(wsq,qsq,gres(8),mres(8),
-     >		xbc(8),lres(8),bfpi(8),bf2pi(8),bfeta(8),
-     >		coupl(8),jres(8),parres(8),0))*flag(8)
-     >		+gpm0r(wsq,qsq,gres(19),mres(19),
-     >		xbc(19),lres(19),bfpi(19),bf2pi(19),bfeta(19),
-     >		coupt1(19),jres(19),parres(19),1)*
-     >		(-1)**(jres(19)-0.5d0)*parres(19)*
-     >		conjg(gpm0r(wsq,qsq,gres(19),mres(19),
-     >		xbc(19),lres(19),bfpi(19),bf2pi(19),bfeta(19),
-     >		coupl(19),jres(19),parres(19),0))*flag(19)
-     >		+1.d0/1.72d0*gpm0r(wsq,qsq,gres(8),mres(8),
+     >		coupl(4),jres(4),parres(4),0))
+     >		*flag(3)*flag(4)
+     >		)
+! As explained above, interference terms in (G+)(G0*):
+        gpwgtsumsqr=gpwgtsumsqr+interf*(
+     >		(gpm0r(wsq,qsq,gres(8),mres(8),
      >		xbc(8),lres(8),bfpi(8),bf2pi(8),bfeta(8),
      >		coupt1(8),jres(8),parres(8),1)*
      >		(-1)**(jres(8)-0.5d0)*parres(8)*
      >		conjg(gpm0r(wsq,qsq,gres(19),mres(19),
      >		xbc(19),lres(19),bfpi(19),bf2pi(19),bfeta(19),
-     >		coupl(19),jres(19),parres(19),0))*flag(19)*flag(8)
-     >		*interf
-     >		+1.d0/1.72d0*conjg(gpm0r(wsq,qsq,gres(8),mres(8),
+     >		coupl(19),jres(19),parres(19),0))
+     >		+conjg(gpm0r(wsq,qsq,gres(8),mres(8),
      >		xbc(8),lres(8),bfpi(8),bf2pi(8),bfeta(8),
      >		coupl(8),jres(8),parres(8),0))*
      >		gpm0r(wsq,qsq,gres(19),mres(19),
      >		xbc(19),lres(19),bfpi(19),bf2pi(19),bfeta(19),
      >		coupt1(19),jres(19),parres(19),1)*
-     >		(-1)**(jres(19)-0.5d0)*parres(19)*flag(19)*flag(8)
-     >		*interf
-        gpwgtsumsqr=gpwgtsumsqr+gpm0r(wsq,qsq,gres(1),mres(1),
-     >		xbc(1),lres(1),bfpi(1),bf2pi(1),bfeta(1),
-     >		coupt1(1),jres(1),parres(1),1)*
-     >		(-1)**(jres(1)-0.5d0)*parres(1)*
-     >		conjg(gpm0r(wsq,qsq,gres(1),mres(1),
-     >		xbc(1),lres(1),bfpi(1),bf2pi(1),bfeta(1),
-     >		coupl(1),jres(1),parres(1),0))*flag(1)
-     >		+gpm0r(wsq,qsq,gres(7),mres(7),
-     >		xbc(7),lres(7),bfpi(7),bf2pi(7),bfeta(7),
-     >		coupt1(7),jres(7),parres(7),1)*
-     >		(-1)**(jres(7)-0.5d0)*parres(7)*
-     >		conjg(gpm0r(wsq,qsq,gres(7),mres(7),
-     >		xbc(7),lres(7),bfpi(7),bf2pi(7),bfeta(7),
-     >		coupl(7),jres(7),parres(7),0))*flag(7)
-     >		+gpm0r(wsq,qsq,gres(1),mres(1),
+     >		(-1)**(jres(19)-0.5d0)*parres(19))
+     >		*flag(19)*flag(8)/1.72d0+
+     >		(gpm0r(wsq,qsq,gres(1),mres(1),
      >		xbc(1),lres(1),bfpi(1),bf2pi(1),bfeta(1),
      >		coupt1(1),jres(1),parres(1),1)*
      >		(-1)**(jres(1)-0.5d0)*parres(1)*
      >		conjg(gpm0r(wsq,qsq,gres(7),mres(7),
      >		xbc(7),lres(7),bfpi(7),bf2pi(7),bfeta(7),
-     >		coupl(7),jres(7),parres(7),0))*flag(7)*flag(1)
-     >		*interf
+     >		coupl(7),jres(7),parres(7),0))
      >		+conjg(gpm0r(wsq,qsq,gres(1),mres(1),
      >		xbc(1),lres(1),bfpi(1),bf2pi(1),bfeta(1),
      >		coupl(1),jres(1),parres(1),0))*
      >		gpm0r(wsq,qsq,gres(7),mres(7),
      >		xbc(7),lres(7),bfpi(7),bf2pi(7),bfeta(7),
      >		coupt1(7),jres(7),parres(7),1)*
-     >		(-1)**(jres(7)-0.5d0)*parres(7)*flag(7)*flag(1)
-     >		*interf
-        gpwgtsumsqr=gpwgtsumsqr+gpm0r(wsq,qsq,gres(3),mres(3),
-     >		xbc(3),lres(3),bfpi(3),bf2pi(3),bfeta(3),
-     >		coupt1(3),jres(3),parres(3),1)*
-     >		(-1)**(jres(3)-0.5d0)*parres(3)*
-     >		conjg(gpm0r(wsq,qsq,gres(3),mres(3),
-     >		xbc(3),lres(3),bfpi(3),bf2pi(3),bfeta(3),
-     >		coupl(3),jres(3),parres(3),0))*flag(3)
-     >		+gpm0r(wsq,qsq,gres(4),mres(4),
-     >		xbc(4),lres(4),bfpi(4),bf2pi(4),bfeta(4),
-     >		coupt1(4),jres(4),parres(4),1)*
-     >		(-1)**(jres(4)-0.5d0)*parres(4)*
-     >		conjg(gpm0r(wsq,qsq,gres(4),mres(4),
-     >		xbc(4),lres(4),bfpi(4),bf2pi(4),bfeta(4),
-     >		coupl(4),jres(4),parres(4),0))*flag(4)
-     >		+gpm0r(wsq,qsq,gres(3),mres(3),
+     >		(-1)**(jres(7)-0.5d0)*parres(7))
+     >		*flag(7)*flag(1)+
+     >		(gpm0r(wsq,qsq,gres(3),mres(3),
      >		xbc(3),lres(3),bfpi(3),bf2pi(3),bfeta(3),
      >		coupt1(3),jres(3),parres(3),1)*
      >		(-1)**(jres(3)-0.5d0)*parres(3)*
      >		conjg(gpm0r(wsq,qsq,gres(4),mres(4),
      >		xbc(4),lres(4),bfpi(4),bf2pi(4),bfeta(4),
-     >		coupl(4),jres(4),parres(4),0))*flag(4)*flag(3)
-     >		*interf
+     >		coupl(4),jres(4),parres(4),0))
      >		+conjg(gpm0r(wsq,qsq,gres(3),mres(3),
      >		xbc(3),lres(3),bfpi(3),bf2pi(3),bfeta(3),
      >		coupl(3),jres(3),parres(3),0))*
      >		gpm0r(wsq,qsq,gres(4),mres(4),
      >		xbc(4),lres(4),bfpi(4),bf2pi(4),bfeta(4),
      >		coupt1(4),jres(4),parres(4),1)*
-     >		(-1)**(jres(4)-0.5d0)*parres(4)*flag(4)*flag(3)
-     >		*interf
+     >		(-1)**(jres(4)-0.5d0)*parres(4))
+     >		*flag(3)*flag(4)
+     >		)
+! Finally, the observables can be calculated from the above amplitudes
         g1tot = real(mn**2/(1.d0+qsq/nu**2)*(gpsumsqr-gmsumsqr+
      >			gpwgtsumsqr*dsqrt(2.d0*qsq)/nu))
         g2tot = real(-mn**2/(1.d0+qsq/nu**2)*(gpsumsqr-gmsumsqr-

@@ -22,11 +22,15 @@ We include 12 resonances, with the index order:
 
 
 #Definition of numerical values
-
 M       = 0.93827
 MPI     = 0.135
 META    = 0.547853
 alpha   = 1./137.0366
+'''
+#Definition of resonance property arrays. In order:
+masses, total widths, hadronic width parameter X, angular momentum, spin, parity,
+branchings for single-pion decay, doubly-pion decay, and eta decay.
+'''
 Mres    = np.array([1.430,1.515,1.535,1.655,1.675,1.685,1.710,1.748,1.232,1.630,1.700,1.725])
 Gres    = np.array([0.350,0.115,0.150,0.140,0.150,0.130,0.100,0.114,0.117,0.140,0.293,0.120])
 Xbc     = np.array([0.3,0.1,0.5,0.5,0.5,0.2,0.5,0.5,0.5,0.5,0.22,0.5])
@@ -44,6 +48,7 @@ petares=np.zeros(len(Mres))
 for i in range(len(Mres)):
     if Mres[i]>M+META:
         petares[i]  = np.sqrt((Mres[i]**2-(M+META)**2)*(Mres[i]**2-(M-META)**2))/(2.*Mres[i])
+
 # A12, A32 and S12 give the electrocoupling evolution with Q2. Note that here a dependence on W^2 is included as well for some of the resonances, due to the kinematic factors used for their experimental extraction
 
 def A12(W2,Q2):
@@ -229,4 +234,131 @@ def get_F2(W2,Q2,flags,interf):
     return np.real(res)
 
 
-print(get_F2(1.232**2,2.025,[0,0,0,0,0,0,0,0,1,0,0,0],1.))
+
+    
+def get_g1(W2,Q2,flags,interf):
+    nu=(W2-M**2+Q2)/(2.*M)
+    gpi=np.asarray(Gres*(ppi(W2)/ppires)**(2.*lres+1.)*((ppires**2+Xbc**2)/(ppi(W2)**2+Xbc**2))**lres)
+    b1jr=0.488866
+    b1yr=-0.648204
+    b1j=sp.jn(1,5.07614*ppi(W2))
+    b1y=sp.yn(1,5.07614*ppi(W2))
+    gpidel=Gres[8]*Mres[8]/np.sqrt(W2)*(b1jr**2+b1yr**2)/(b1j**2+b1y**2)
+    gpi[8]=gpidel
+    geta=np.zeros(len(Mres))
+    for i in range(len(Mres)):
+	if petares[i]!=0.:
+	    geta[i]=Gres[i]*(peta(W2)/petares[i])**(2.*lres[i]+1.)*((petares[i]**2+Xbc[i]**2)/(peta(W2)**2+Xbc[i]**2))**lres[i]
+    gpipi=np.asarray(Gres*(ppipi(W2)/ppipires)**(2.*lres+4.)*((ppipires**2+Xbc**2)/(ppipi(W2)**2+Xbc**2))**(lres+2.))
+    gtot=np.asarray(bpi*gpi+beta*geta+bpipi*gpipi)
+    p1232=parres*(-1.)**(jres-0.5)
+    coefs=np.sqrt((Mres**2-M**2)/Mres)/(2.*M)/np.sqrt(np.pi)*Mres*np.sqrt(gtot)/(Mres**2-W2-complex(0.,1.)*Mres*gtot)*qgam(Mres**2,Q2)/qgam(W2,Q2)*np.sqrt(2.*np.sqrt(W2)*M*(W2-M**2)/(2.*np.sqrt(W2)*np.pi*alpha*(Mres**2-M**2)))
+    gpr=A12(W2,Q2)*coefs
+    gmr=A32(W2,Q2)*coefs*p1232
+    g0r=S12(W2,Q2)*coefs*p1232/np.sqrt(2.)
+    tempp=np.asarray(np.real(gpr*np.conj(gpr)))
+    tempm=np.asarray(np.real(gmr*np.conj(gmr)))
+    temp0=np.asarray(np.real(g0r*np.conj(g0r)))
+    tempp0=np.asarray(np.real(gpr*p1232*np.conj(g0r)))
+    gprsqr=np.sum(tempp*flags)
+    gmrsqr=np.sum(tempm*flags)
+    g0rsqr=np.sum(temp0*flags)
+    gp0rsqr=np.sum(tempp0*flags)
+    if interf == 1.:
+        gprsqr+=(gpr[0]*np.conj(gpr[6])+gpr[6]*np.conj(gpr[0]))*flags[0]*flags[6]
+        gprsqr+=(gpr[2]*np.conj(gpr[3])+gpr[3]*np.conj(gpr[2]))*flags[2]*flags[3]
+        gprsqr+=(gpr[7]*np.conj(gpr[11])+gpr[11]*np.conj(gpr[7]))/1.72*flags[7]*flags[11]
+        gmrsqr+=(gmr[0]*np.conj(gmr[6])+gmr[6]*np.conj(gmr[0]))*flags[0]*flags[6]
+        gmrsqr+=(gmr[2]*np.conj(gmr[3])+gmr[3]*np.conj(gmr[2]))*flags[2]*flags[3]
+        gmrsqr+=(gmr[7]*np.conj(gmr[11])+gmr[11]*np.conj(gmr[7]))/1.72*flags[7]*flags[11]
+        g0rsqr+=(g0r[0]*np.conj(g0r[6])+g0r[6]*np.conj(g0r[0]))*flags[0]*flags[6]
+        g0rsqr+=(g0r[2]*np.conj(g0r[3])+g0r[3]*np.conj(g0r[2]))*flags[2]*flags[3]
+        g0rsqr+=(g0r[7]*np.conj(g0r[11])+g0r[11]*np.conj(g0r[7]))/1.72*flags[7]*flags[11]
+        gp0rsqr+=np.real(gpr[0]*p1232*np.conj(g0r[6])+gpr[6]*p1232*np.conj(g0r[0]))*flags[0]*flags[6]
+        gp0rsqr+=np.real(gpr[2]*p1232*np.conj(g0r[3])+gpr[3]*p1232*np.conj(g0r[2]))*flags[2]*flags[3]
+        gp0rsqr+=np.real(gpr[7]*p1232*np.conj(g0r[11])+gpr[11]*p1232*np.conj(g0r[7]))/1.72*flags[7]*flags[11]
+    res=M**2/(1.+Q2/nu**2)*(gprsqr-gmrsqr+gp0rsqr*np.sqrt(2.*Q2)/nu)
+    return np.real(res)
+    
+def get_g2(W2,Q2,flags,interf):
+    nu=(W2-M**2+Q2)/(2.*M)
+    gpi=np.asarray(Gres*(ppi(W2)/ppires)**(2.*lres+1.)*((ppires**2+Xbc**2)/(ppi(W2)**2+Xbc**2))**lres)
+    b1jr=0.488866
+    b1yr=-0.648204
+    b1j=sp.jn(1,5.07614*ppi(W2))
+    b1y=sp.yn(1,5.07614*ppi(W2))
+    gpidel=Gres[8]*Mres[8]/np.sqrt(W2)*(b1jr**2+b1yr**2)/(b1j**2+b1y**2)
+    gpi[8]=gpidel
+    geta=np.zeros(len(Mres))
+    for i in range(len(Mres)):
+	if petares[i]!=0.:
+	    geta[i]=Gres[i]*(peta(W2)/petares[i])**(2.*lres[i]+1.)*((petares[i]**2+Xbc[i]**2)/(peta(W2)**2+Xbc[i]**2))**lres[i]
+    gpipi=np.asarray(Gres*(ppipi(W2)/ppipires)**(2.*lres+4.)*((ppipires**2+Xbc**2)/(ppipi(W2)**2+Xbc**2))**(lres+2.))
+    gtot=np.asarray(bpi*gpi+beta*geta+bpipi*gpipi)
+    p1232=parres*(-1.)**(jres-0.5)
+    coefs=np.sqrt((Mres**2-M**2)/Mres)/(2.*M)/np.sqrt(np.pi)*Mres*np.sqrt(gtot)/(Mres**2-W2-complex(0.,1.)*Mres*gtot)*qgam(Mres**2,Q2)/qgam(W2,Q2)*np.sqrt(2.*np.sqrt(W2)*M*(W2-M**2)/(2.*np.sqrt(W2)*np.pi*alpha*(Mres**2-M**2)))
+    gpr=A12(W2,Q2)*coefs
+    gmr=A32(W2,Q2)*coefs*p1232
+    g0r=S12(W2,Q2)*coefs*p1232/np.sqrt(2.)
+    tempp=np.asarray(np.real(gpr*np.conj(gpr)))
+    tempm=np.asarray(np.real(gmr*np.conj(gmr)))
+    temp0=np.asarray(np.real(g0r*np.conj(g0r)))
+    tempp0=np.asarray(np.real(gpr*p1232*np.conj(g0r)))
+    gprsqr=np.sum(tempp*flags)
+    gmrsqr=np.sum(tempm*flags)
+    g0rsqr=np.sum(temp0*flags)
+    gp0rsqr=np.sum(tempp0*flags)
+    if interf == 1.:
+        gprsqr+=(gpr[0]*np.conj(gpr[6])+gpr[6]*np.conj(gpr[0]))*flags[0]*flags[6]
+        gprsqr+=(gpr[2]*np.conj(gpr[3])+gpr[3]*np.conj(gpr[2]))*flags[2]*flags[3]
+        gprsqr+=(gpr[7]*np.conj(gpr[11])+gpr[11]*np.conj(gpr[7]))/1.72*flags[7]*flags[11]
+        gmrsqr+=(gmr[0]*np.conj(gmr[6])+gmr[6]*np.conj(gmr[0]))*flags[0]*flags[6]
+        gmrsqr+=(gmr[2]*np.conj(gmr[3])+gmr[3]*np.conj(gmr[2]))*flags[2]*flags[3]
+        gmrsqr+=(gmr[7]*np.conj(gmr[11])+gmr[11]*np.conj(gmr[7]))/1.72*flags[7]*flags[11]
+        g0rsqr+=(g0r[0]*np.conj(g0r[6])+g0r[6]*np.conj(g0r[0]))*flags[0]*flags[6]
+        g0rsqr+=(g0r[2]*np.conj(g0r[3])+g0r[3]*np.conj(g0r[2]))*flags[2]*flags[3]
+        g0rsqr+=(g0r[7]*np.conj(g0r[11])+g0r[11]*np.conj(g0r[7]))/1.72*flags[7]*flags[11]
+        gp0rsqr+=np.real(gpr[0]*p1232*np.conj(g0r[6])+gpr[6]*p1232*np.conj(g0r[0]))*flags[0]*flags[6]
+        gp0rsqr+=np.real(gpr[2]*p1232*np.conj(g0r[3])+gpr[3]*p1232*np.conj(g0r[2]))*flags[2]*flags[3]
+        gp0rsqr+=np.real(gpr[7]*p1232*np.conj(g0r[11])+gpr[11]*p1232*np.conj(g0r[7]))/1.72*flags[7]*flags[11]
+    res=-M**2/(1.+Q2/nu**2)*(gprsqr-gmrsqr-gp0rsqr*np.sqrt(2./Q2)*nu)
+    return np.real(res)
+
+def get_FL(W2,Q2,flags,interf):
+    nu=(W2-M**2+Q2)/(2.*M)
+    xbj=Q2/(2.*M*nu)
+    res=(1.+4.*M**2*xbj**2/Q2)*get_F2(W2,Q2,flags,interf)-2.*xbj*get_F1(W2,Q2,flags,interf)
+    return res
+
+def get_H12(W2,Q2,flags,interf):
+    nu=(W2-M**2+Q2)/(2.*M)
+    res=get_F1(W2,Q2,flags,interf)+get_g1(W2,Q2,flags,interf)-Q2/nu**2*get_g2(W2,Q2,flags,interf)
+    return res
+
+def get_H32(W2,Q2,flags,interf):
+    nu=(W2-M**2+Q2)/(2.*M)
+    res=get_F1(W2,Q2,flags,interf)-get_g1(W2,Q2,flags,interf)+Q2/nu**2*get_g2(W2,Q2,flags,interf)
+    return res
+
+def get_A1(W2,Q2,flags,interf):
+    nu=(W2-M**2+Q2)/(2.*M)
+    xbj=Q2/(2.*M*nu)
+    res=(get_g1(W2,Q2,flags,interf)-4.*M**2*xbj**2/Q2*get_g2(W2,Q2,flags,interf))/get_F1(W2,Q2,flags,interf)
+    return res
+
+def get_A2(W2,Q2,flags,interf):
+    nu=(W2-M**2+Q2)/(2.*M)
+    res=np.sqrt(Q2)/nu*(get_g1(W2,Q2,flags,interf)+get_g2(W2,Q2,flags,interf))/get_F1(W2,Q2,flags,interf)
+    return res
+    
+
+
+print(get_F1(1.75**2,2.025,[0,0,0,0,0,0,0,1,0,0,0,0],1.))
+print(get_F2(1.75**2,2.025,[0,0,0,0,0,0,0,1,0,0,0,0],1.))
+print(get_FL(1.75**2,2.025,[0,0,0,0,0,0,0,1,0,0,0,0],1.))
+print(get_g1(1.75**2,2.025,[0,0,0,0,0,0,0,1,0,0,0,0],1.))
+print(get_g2(1.75**2,2.025,[0,0,0,0,0,0,0,1,0,0,0,0],1.))
+print(get_H12(1.75**2,2.025,[0,0,0,0,0,0,0,1,0,0,0,0],1.))
+print(get_H32(1.75**2,2.025,[0,0,0,0,0,0,0,1,0,0,0,0],1.))
+print(get_A1(1.75**2,2.025,[0,0,0,0,0,0,0,1,0,0,0,0],1.))
+print(get_A2(1.75**2,2.025,[0,0,0,0,0,0,0,1,0,0,0,0],1.))
