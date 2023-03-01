@@ -352,13 +352,37 @@ def get_A2(W2,Q2,flags,interf):
     return res
     
 
+print('Specify the Q2 value in GeV^2:')
+Q2user=input()
+print('Specify the W value in GeV:')
+Wuser=input()
+print('Do you want to include interferences? 1/0')
+interfyn=input()
+if interfyn==1:
+	interf=1.
+elif interfyn==0:
+	interf=0.
+print('\n\n\n')
+print('Specify which resonances to include with comma-separated 1s and 0s')
+print('in the following order:\n')
+print('N(1440)1/2+,N(1520)3/2-,N(1535)1/2-,N(1650)1/2-,N(1675)5/2-,N(1680)5/2+,')
+print('N(1710)1/2+,N(1720)3/2+,D(1232)3/2+,D(1620)1/2-D(1700)3/2-,Nprime(1720)3/2+\n\n')
+print('All 12 values have to be specified.')
+print('If you press enter or do not have a total of 12 values:')
+print('the DEFAULT 1,1,1,1,1,1,1,1,1,1,1,1 is chosen (sum over all resonances).')
+resar=[1,1,1,1,1,1,1,1,1,1,1,1]
+reschoi=raw_input().split(',')
+if len(reschoi)==12:
+	for i in range(len(reschoi)):
+		resar[i]=int(reschoi[i])
 
-print(get_F1(1.75**2,2.025,[1,1,1,1,1,1,1,1,1,1,1,1],1.))
-print(get_F2(1.75**2,2.025,[1,1,1,1,1,1,1,1,1,1,1,1],1.))
-print(get_FL(1.75**2,2.025,[1,1,1,1,1,1,1,1,1,1,1,1],1.))
-print(get_g1(1.75**2,2.025,[1,1,1,1,1,1,1,1,1,1,1,1],1.))
-print(get_g2(1.75**2,2.025,[1,1,1,1,1,1,1,1,1,1,1,1],1.))
-print(get_H12(1.75**2,2.025,[1,1,1,1,1,1,1,1,1,1,1,1],1.))
-print(get_H32(1.75**2,2.025,[1,1,1,1,1,1,1,1,1,1,1,1],1.))
-print(get_A1(1.75**2,2.025,[1,1,1,1,1,1,1,1,1,1,1,1],1.))
-print(get_A2(1.75**2,2.025,[1,1,1,1,1,1,1,1,1,1,1,1],1.))
+
+print('F1 = %.5f'%get_F1(Wuser**2,Q2user,resar,interf))
+print('F2 = %.5f'%get_F2(Wuser**2,Q2user,resar,interf))
+print('FL = %.5f'%get_FL(Wuser**2,Q2user,resar,interf))
+print('g1 = %.5f'%get_g1(Wuser**2,Q2user,resar,interf))
+print('g2 = %.5f'%get_g2(Wuser**2,Q2user,resar,interf))
+print('H1/2 = %.5f'%get_H12(Wuser**2,Q2user,resar,interf))
+print('H3/2 = %.5f'%get_H32(Wuser**2,Q2user,resar,interf))
+print('A1 = %.5f'%get_A1(Wuser**2,Q2user,resar,interf))
+print('A2 = %.5f'%get_A2(Wuser**2,Q2user,resar,interf))
