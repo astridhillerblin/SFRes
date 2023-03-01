@@ -274,9 +274,9 @@ def get_g1(W2,Q2,flags,interf):
         g0rsqr+=(g0r[0]*np.conj(g0r[6])+g0r[6]*np.conj(g0r[0]))*flags[0]*flags[6]
         g0rsqr+=(g0r[2]*np.conj(g0r[3])+g0r[3]*np.conj(g0r[2]))*flags[2]*flags[3]
         g0rsqr+=(g0r[7]*np.conj(g0r[11])+g0r[11]*np.conj(g0r[7]))/1.72*flags[7]*flags[11]
-        gp0rsqr+=np.real(gpr[0]*p1232*np.conj(g0r[6])+gpr[6]*p1232*np.conj(g0r[0]))*flags[0]*flags[6]
-        gp0rsqr+=np.real(gpr[2]*p1232*np.conj(g0r[3])+gpr[3]*p1232*np.conj(g0r[2]))*flags[2]*flags[3]
-        gp0rsqr+=np.real(gpr[7]*p1232*np.conj(g0r[11])+gpr[11]*p1232*np.conj(g0r[7]))/1.72*flags[7]*flags[11]
+        gp0rsqr+=np.real(gpr[0]*p1232[0]*np.conj(g0r[6])+gpr[6]*p1232[6]*np.conj(g0r[0]))*flags[0]*flags[6]
+        gp0rsqr+=np.real(gpr[2]*p1232[2]*np.conj(g0r[3])+gpr[3]*p1232[3]*np.conj(g0r[2]))*flags[2]*flags[3]
+        gp0rsqr+=np.real(gpr[7]*p1232[7]*np.conj(g0r[11])+gpr[11]*p1232[11]*np.conj(g0r[7]))/1.72*flags[7]*flags[11]
     res=M**2/(1.+Q2/nu**2)*(gprsqr-gmrsqr+gp0rsqr*np.sqrt(2.*Q2)/nu)
     return np.real(res)
     
@@ -318,9 +318,9 @@ def get_g2(W2,Q2,flags,interf):
         g0rsqr+=(g0r[0]*np.conj(g0r[6])+g0r[6]*np.conj(g0r[0]))*flags[0]*flags[6]
         g0rsqr+=(g0r[2]*np.conj(g0r[3])+g0r[3]*np.conj(g0r[2]))*flags[2]*flags[3]
         g0rsqr+=(g0r[7]*np.conj(g0r[11])+g0r[11]*np.conj(g0r[7]))/1.72*flags[7]*flags[11]
-        gp0rsqr+=np.real(gpr[0]*p1232*np.conj(g0r[6])+gpr[6]*p1232*np.conj(g0r[0]))*flags[0]*flags[6]
-        gp0rsqr+=np.real(gpr[2]*p1232*np.conj(g0r[3])+gpr[3]*p1232*np.conj(g0r[2]))*flags[2]*flags[3]
-        gp0rsqr+=np.real(gpr[7]*p1232*np.conj(g0r[11])+gpr[11]*p1232*np.conj(g0r[7]))/1.72*flags[7]*flags[11]
+        gp0rsqr+=np.real(gpr[0]*p1232[0]*np.conj(g0r[6])+gpr[6]*p1232[6]*np.conj(g0r[0]))*flags[0]*flags[6]
+        gp0rsqr+=np.real(gpr[2]*p1232[2]*np.conj(g0r[3])+gpr[3]*p1232[3]*np.conj(g0r[2]))*flags[2]*flags[3]
+        gp0rsqr+=np.real(gpr[7]*p1232[7]*np.conj(g0r[11])+gpr[11]*p1232[11]*np.conj(g0r[7]))/1.72*flags[7]*flags[11]
     res=-M**2/(1.+Q2/nu**2)*(gprsqr-gmrsqr-gp0rsqr*np.sqrt(2./Q2)*nu)
     return np.real(res)
 
@@ -353,12 +353,12 @@ def get_A2(W2,Q2,flags,interf):
     
 
 
-print(get_F1(1.75**2,2.025,[0,0,0,0,0,0,0,1,0,0,0,0],1.))
-print(get_F2(1.75**2,2.025,[0,0,0,0,0,0,0,1,0,0,0,0],1.))
-print(get_FL(1.75**2,2.025,[0,0,0,0,0,0,0,1,0,0,0,0],1.))
-print(get_g1(1.75**2,2.025,[0,0,0,0,0,0,0,1,0,0,0,0],1.))
-print(get_g2(1.75**2,2.025,[0,0,0,0,0,0,0,1,0,0,0,0],1.))
-print(get_H12(1.75**2,2.025,[0,0,0,0,0,0,0,1,0,0,0,0],1.))
-print(get_H32(1.75**2,2.025,[0,0,0,0,0,0,0,1,0,0,0,0],1.))
-print(get_A1(1.75**2,2.025,[0,0,0,0,0,0,0,1,0,0,0,0],1.))
-print(get_A2(1.75**2,2.025,[0,0,0,0,0,0,0,1,0,0,0,0],1.))
+print(get_F1(1.75**2,2.025,[1,1,1,1,1,1,1,1,1,1,1,1],1.))
+print(get_F2(1.75**2,2.025,[1,1,1,1,1,1,1,1,1,1,1,1],1.))
+print(get_FL(1.75**2,2.025,[1,1,1,1,1,1,1,1,1,1,1,1],1.))
+print(get_g1(1.75**2,2.025,[1,1,1,1,1,1,1,1,1,1,1,1],1.))
+print(get_g2(1.75**2,2.025,[1,1,1,1,1,1,1,1,1,1,1,1],1.))
+print(get_H12(1.75**2,2.025,[1,1,1,1,1,1,1,1,1,1,1,1],1.))
+print(get_H32(1.75**2,2.025,[1,1,1,1,1,1,1,1,1,1,1,1],1.))
+print(get_A1(1.75**2,2.025,[1,1,1,1,1,1,1,1,1,1,1,1],1.))
+print(get_A2(1.75**2,2.025,[1,1,1,1,1,1,1,1,1,1,1,1],1.))
