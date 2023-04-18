@@ -7,6 +7,9 @@ Details about the physics and formalism behind the codes can be found in our wor
 
 ## Fortran code
 ### Includes complete and speedy uncertainty propagation
+
+When running the code, observable tables are generated as text files, for a value of Q^2 specified by the user, and at running values of W, from threshold up to 2.2 GeV. Note that, to date, the results are most reliable for values of $Q^2$ between around 0.5 and 7 GeV^2, and W between threshold and 1.8 GeV.
+
 The code can be run with either of the following two options:
 1) gfortran main.f -fcoarray=single
 2) ./compile.sh
