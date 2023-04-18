@@ -8,7 +8,7 @@ Details about the physics and formalism behind the codes can be found in our wor
 ## Fortran code
 ### Includes complete and speedy uncertainty propagation
 
-When running the code, observable tables are generated as text files, for a value of $Q^2$ specified by the user, and at running values of $W$, from threshold up to $2.2~\text{GeV}$. Note that, to date, the results are most reliable for values of $Q^2$ between around $0.5$ and $7~\text{GeV}^2$, and $W$ between threshold and $1.8~\text{GeV}$.
+When running the code, observable tables are generated as text files, for a value of $Q^2$ specified by the user, and at running values of $W$, from threshold up to $2.20~\text{GeV}$, in steps of $0.01~\text{GeV}$. Note that, to date, the results are most reliable for values of $Q^2$ between around $0.5$ and $7~\text{GeV}^2$, and $W$ between threshold and $1.8~\text{GeV}$.
 
 The generated observables are the structure functions $F_1$, $F_2$, $F_L$, $g_1$, $g_2$, as well as asymmetries $A_1$, $A_2$, $H_{1/2}$, $H_{3/2}$. Please refer to the readme file of the folder Output for further details.
 
