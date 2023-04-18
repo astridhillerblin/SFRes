@@ -8,7 +8,7 @@ Details about the physics and formalism behind the codes can be found in our wor
 ## Fortran code
 ### Includes complete and speedy uncertainty propagation
 
-When running the code, observable tables are generated as text files, for a value of $Q^2$ specified by the user, and at running values of W, from threshold up to 2.2 GeV. Note that, to date, the results are most reliable for values of $Q^2$ between around 0.5 and $7~\text{GeV}^2$, and W between threshold and 1.8 GeV.
+When running the code, observable tables are generated as text files, for a value of $Q^2$ specified by the user, and at running values of $W$, from threshold up to $2.2~\text{GeV}$. Note that, to date, the results are most reliable for values of $Q^2$ between around $0.5$ and $7~\text{GeV}^2$, and $W$ between threshold and $1.8~\text{GeV}$.
 
 The generated observables are the structure functions $F_1$, $F_2$, $F_L$, $g_1$, $g_2$, as well as asymmetries $A_1$, $A_2$, $H_{1/2}$, $H_{3/2}$. Please refer to the readme file of the folder Output for further details.
 
@@ -20,8 +20,8 @@ For option 2), before being able to (permanently) run it, you will need to turn 
 chmod 755 compile.sh
 
 When running the code, the following steps happen in order:
-1) The terminal prompts the user to enter a $Q^2$ value in GeV$^2$ at which output files should be generated. Please enter the value of choice.
-2) The terminal asks whether truncated moments should be generated (y) or not (n). These observables are integrated over energies and given as functions of $Q^2$ in the range 1 to 3.5 GeV$^2$. Therefore, it is not necessary to re-generate these files every time, since they will remain the same for any choice in 1). Due to the integrations, the running time is slightly longer and thus it might be of advantage to skip this step most of the time.
+1) The terminal prompts the user to enter a $Q^2$ value in $\text{GeV}^2$ at which output files should be generated. Please enter the value of choice.
+2) The terminal asks whether truncated moments should be generated (y) or not (n). These observables are integrated over energies and given as functions of $Q^2$ in the range $1$ to $3.5~\text{GeV}^2$. Therefore, it is not necessary to re-generate these files every time, since they will remain the same for any choice in 1). Due to the integrations, the running time is slightly longer and thus it might be of advantage to skip this step most of the time.
 3) The final question is whether the uncertainty propagation should be generated (y or n). This involves generating 10000 Monte-Carlo samples, for which reason a long runtime is expected. Therefore, while for final results one should generate the uncertainties, for tests one should consider skipping this step.
 
 The following output files are then created in the folder Output:
