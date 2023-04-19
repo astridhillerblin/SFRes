@@ -1,11 +1,11 @@
 !======================================================================!
 ! Write plot files
 !======================================================================!
-	subroutine write_ressamp(qsq)
+	subroutine write_ressamp(qsq,ebeam)
 	use phys_consts
 	implicit none
 	character*60, dimension(2) :: res_file
-	real(8) qsq,wsq
+	real(8) qsq,wsq,ebeam
 	real(8), dimension (19) :: flag
 	integer iloop,jloop,floop
 	integer iwrt
@@ -14,6 +14,7 @@
 	real(8) f1tot,f2tot,fltot,g1tot,g2tot
 	real(8) h12tot,h32tot
 	real(8) a1tot,a2tot
+	real(8) sigt,sigl,dxsdq2dw
 	real(8) interf
 	common/sf/f1tot,f2tot,fltot,g1tot,g2tot
 	common/hel/h12tot,h32tot
@@ -22,6 +23,7 @@
 	common/isupov/isup
 	common/nsamp/nmc
 	common/swinterf/interf
+	common/xs/sigt,sigl,dxsdq2dw
 ! The files where all sampled values are stored:
 	res_file(1)='Output/res_samp.dat'
 	res_file(2)='Output/resinterf_samp.dat'
@@ -41,10 +43,11 @@
 	do samp = 1,nmc
 	do jloop = 0,112
 	wsq = (1.08+0.01d0*jloop)**2!starts just above threshold
-	call res_calc(wsq,qsq)
-	write (iwrt,"(F10.2,9(F10.4))")
+	call res_calc(wsq,qsq,ebeam)
+	write (iwrt,"(F10.2,12(F10.4))")
      >		dsqrt(wsq),f1tot,f2tot,fltot,g1tot,g2tot
-     >		,h12tot,h32tot,a1tot,a2tot
+     >		,h12tot,h32tot,a1tot,a2tot,
+     >		sigt,sigl,dxsdq2dw
 	enddo
 	enddo
 	close (iwrt)
@@ -53,20 +56,21 @@
 !======================================================================!
 ! Write single resonances
 !======================================================================!
-	subroutine write_singres(qsq)
+	subroutine write_singres(qsq,ebeam)
 	use phys_consts
 	implicit none
 	character*60, dimension (21) :: sing_file
 	real(8), dimension (19) :: flag
 	character*1 chint1
 	character*2 chint2
-	real(8) wsq,qsq
+	real(8) wsq,qsq,ebeam
 	integer iloop,jloop,floop,rloop
 	integer iwrt
 	integer isup
 	real(8) f1tot,f2tot,fltot,g1tot,g2tot
 	real(8) h12tot,h32tot
 	real(8) a1tot,a2tot
+	real(8) sigt,sigl,dxsdq2dw
 	real(8) interf
 	common/sf/f1tot,f2tot,fltot,g1tot,g2tot
 	common/hel/h12tot,h32tot
@@ -74,6 +78,7 @@
 	common/sing/flag
 	common/isupov/isup
 	common/swinterf/interf
+	common/xs/sigt,sigl,dxsdq2dw
 ! We use the central electrocoupling values fitted by Isupov:
 	isup = 1
 	iwrt = 101
@@ -101,15 +106,16 @@
 	flag(floop) = 0.d0	
 	enddo
 	flag(rloop) = 1.d0
-	write (iwrt,"(10(A10))") "W [GeV]","F1","F2","FL","g1","g2"
-     >			,"H1/2","H3/2","A1","A2"
+	write (iwrt,"(13(A10))") "W [GeV]","F1","F2","FL","g1","g2"
+     >			,"H1/2","H3/2","A1","A2","sigT","sigL","dXS"
 ! The observables are calculated and written:
 	do jloop = 0,112
 	wsq = (1.08+0.01d0*jloop)**2!starts just above threshold
-	call res_calc(wsq,qsq)
-	write (iwrt,"(F10.2,9(F10.4))")
+	call res_calc(wsq,qsq,ebeam)
+	write (iwrt,"(F10.2,12(F10.4))")
      >		dsqrt(wsq),f1tot,f2tot,fltot,g1tot,g2tot
-     >		,h12tot,h32tot,a1tot,a2tot
+     >		,h12tot,h32tot,a1tot,a2tot,
+     >		sigt,sigl,dxsdq2dw
 	enddo
 	close (iwrt)
 	enddo
@@ -121,14 +127,15 @@
 	do iloop=1,2
 	open (iwrt, file = sing_file(19+iloop))
 	interf = (iloop-1)*1.d0
-	write (iwrt,"(10(A10))") "W [GeV]","F1","F2","FL","g1","g2"
-     >			,"H1/2","H3/2","A1","A2"
+	write (iwrt,"(13(A10))") "W [GeV]","F1","F2","FL","g1","g2"
+     >			,"H1/2","H3/2","A1","A2","sigT","sigL","dXS"
 	do jloop = 0,112
 	wsq = (1.08+0.01d0*jloop)**2!starts just above threshold
-	call res_calc(wsq,qsq)
-	write (iwrt,"(F10.2,9(F10.4))")
+	call res_calc(wsq,qsq,ebeam)
+	write (iwrt,"(F10.2,12(F10.4))")
      >		dsqrt(wsq),f1tot,f2tot,fltot,g1tot,g2tot
-     >		,h12tot,h32tot,a1tot,a2tot
+     >		,h12tot,h32tot,a1tot,a2tot,
+     >		sigt,sigl,dxsdq2dw
 	enddo
 	close (iwrt)
 	enddo
@@ -143,7 +150,7 @@
 	real(8),dimension(20000)::integrand1,integrand2,integrand3,
      >		integrand4,integrand5
 	real(8), dimension (19) :: flag
-	real(8) wsq,qsq,wsqrmax,numax,x0,nu
+	real(8) wsq,qsq,ebeam,wsqrmax,numax,x0,nu
 	real(8) wsqrmax2,numax2,x02,wsqrmax3,numax3,x03,
      >		wsqrthr,nuthr,xthr
 	integer floop,qloop,rloop
@@ -204,7 +211,7 @@
 	do i1=1,n1p
                 nu=qsq/(2.d0*mn*xrd(i1))
                 wsq=mn**2-qsq+2.d0*mn*nu
-		call res_calc(wsq,qsq)
+		call res_calc(wsq,qsq,ebeam)
 		integrand1(i1)=f1tot
 		integrand2(i1)=f2tot
 		integrand3(i1)=fltot
@@ -220,7 +227,7 @@
 	do i1=1,n1p
                 nu=qsq/(2.d0*mn*xrd(i1))
                 wsq=mn**2-qsq+2.d0*mn*nu
-		call res_calc(wsq,qsq)
+		call res_calc(wsq,qsq,ebeam)
 		integrand1(i1)=f1tot
 		integrand2(i1)=f2tot
 		integrand3(i1)=fltot
@@ -236,7 +243,7 @@
 	do i1=1,n1p
                 nu=qsq/(2.d0*mn*xrd(i1))
                 wsq=mn**2-qsq+2.d0*mn*nu
-		call res_calc(wsq,qsq)
+		call res_calc(wsq,qsq,ebeam)
 		integrand1(i1)=f1tot
 		integrand2(i1)=f2tot
 		integrand3(i1)=fltot
@@ -252,7 +259,7 @@
 	do i1=1,n1p
                 nu=qsq/(2.d0*mn*xrd(i1))
                 wsq=mn**2-qsq+2.d0*mn*nu
-		call res_calc(wsq,qsq)
+		call res_calc(wsq,qsq,ebeam)
 		integrand1(i1)=f1tot
 		integrand2(i1)=f2tot
 		integrand3(i1)=fltot

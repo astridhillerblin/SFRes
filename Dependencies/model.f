@@ -1,14 +1,15 @@
 !======================================================================!
 ! SUBROUTINE FOR RESONANT CONTRIBUTIONS TO ALL OBSERVABLES
 !======================================================================!
-	subroutine res_calc(wsq,qsq)
+	subroutine res_calc(wsq,qsq,ebeam)
 	use res_decl
 	use phys_consts
 	use math_consts
 	implicit none
 	real(8) interf
-	real(8) wsq,qsq
+	real(8) wsq,qsq,ebeam
 	real(8) f1tot,f2tot,fltot,g1tot,g2tot
+	real(8) sigt,sigl,dxsdq2dw
 	real(8) h12tot,h32tot
 	real(8) a1tot,a2tot
 	real(8), dimension (19) :: coupsqt,coupsql,coupt1,coupt2,coupl
@@ -18,9 +19,11 @@
 	integer ind
 	integer isup
 	real(8) xbj,nu
+	real(8) eps,gamv
 	common/sf/f1tot,f2tot,fltot,g1tot,g2tot
 	common/hel/h12tot,h32tot
 	common/asym/a1tot,a2tot
+	common/xs/sigt,sigl,dxsdq2dw
 	common/sing/flag
 	common/isupov/isup
 	common/swinterf/interf
@@ -284,6 +287,10 @@
 	h32tot=f1tot-g1tot+qsq/nu**2*g2tot
 	a1tot=(g1tot-4.d0*mn**2*xbj**2/qsq*g2tot)/f1tot
 	a2tot=sqrt(qsq)/nu*(g1tot+g2tot)/f1tot
+	sigt=8.d0*pi**2*alpha/(wsq-mn**2)*f1tot*389.379
+	sigl=8.d0*pi**2*alpha/(wsq-mn**2)*
+     >		((1.d0+qsq/nu**2)/(2.d0*xbj)*f2tot-f1tot)*389.379
+	dxsdq2dw=(sigt+eps(wsq,qsq,ebeam)*sigl)*gamv(wsq,qsq,ebeam)
 	endsubroutine res_calc
 !======================================================================!
 ! G+, G0, G- helicity amplitudes
@@ -727,3 +734,26 @@
      >			geta(wsq,gres,mres,xbc,lres)*bfeta
 	endif
 	end function ghad
+!======================================================================!
+! FUNCTION THAT CALCULATES THE VIRTUAL PHOTON TRANSVERSE POLARIZATION
+!======================================================================!
+	real(8) function eps(wsq,qsq,ebeam)
+	use phys_consts
+	implicit none
+	real(8) wsq,qsq,ebeam,nu,sin2th
+	nu = (wsq-mn**2+qsq)/(2.*mn)
+	sin2th = qsq/(4.d0*ebeam*(ebeam-nu))
+	eps = 1./(1.+2.*(1.+nu**2/qsq)*sin2th/(1.d0-sin2th))
+	end function eps
+!======================================================================!
+! FUNCTION THAT CALCULATES THE VIRTUAL PHOTON FLUX GAMMA
+!======================================================================!
+	real(8) function gamv(wsq,qsq,ebeam)
+	use phys_consts
+	use math_consts
+	implicit none
+	real(8) wsq,qsq,ebeam,nu,eps
+	nu = (wsq-mn**2+qsq)/(2.*mn)
+	gamv = alpha/(4.d0*pi)*dsqrt(wsq)/(ebeam*mn)**2*(wsq-mn**2)/
+     >		(qsq*(1-eps(wsq,qsq,ebeam)))
+	end function gamv
