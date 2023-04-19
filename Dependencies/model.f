@@ -287,7 +287,9 @@
 	h32tot=f1tot-g1tot+qsq/nu**2*g2tot
 	a1tot=(g1tot-4.d0*mn**2*xbj**2/qsq*g2tot)/f1tot
 	a2tot=sqrt(qsq)/nu*(g1tot+g2tot)/f1tot
-	sigt=8.d0*pi**2*alpha/(wsq-mn**2)*f1tot*389.379
+! sigt and sigl are given in microbarn,
+!  while dxsdq2dw is in nb/GeV^3
+	sigt=8.d0*pi**2*alpha/(wsq-mn**2)*f1tot*389.379 ! in microbarn
 	sigl=8.d0*pi**2*alpha/(wsq-mn**2)*
      >		((1.d0+qsq/nu**2)/(2.d0*xbj)*f2tot-f1tot)*389.379
 	dxsdq2dw=1000.d0*
