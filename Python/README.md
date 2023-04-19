@@ -15,5 +15,5 @@ If return is pressed (or the wrong input format is inserted), then the default 1
 Otherwise, if 12 comma-separated 1s and 0s are inserted, the respective resonances are switched on and off. The order of resonances is:
 N(1440)1/2+,N(1520)3/2-,N(1535)1/2-,N(1650)1/2-,N(1675)5/2-,N(1680)5/2+,N(1710)1/2+,N(1720)3/2+,Delta(1232)3/2+,Delta(1620)1/2-,Delta(1700)3/2-,N'(1720)3/2+
 
-The output is a list of all observables at the chosen values of Q^2 and W:
-F1, F2, FL, g1, g2, H1/2, H3/2, A1, A2
+The output is a list of all observables at the chosen values of $Q^2$ and $W$:
+$F_1$, $F_2$, $F_L$, $g_1$, $g_2$, $H_{1/2}$, $H_{3/2}$, $A_1$, $A_2$, $\sigma_T~[\mu b]$, $\sigma_L~[\mu b]$, $d\sigma/(dQ^2dW)~[nb/GeV^3]$
