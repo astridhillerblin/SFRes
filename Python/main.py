@@ -158,6 +158,19 @@ def ppipi(W2):
     else:
         res=np.sqrt((W2-(M+2.*MPI)**2)*(W2-(M-2.*MPI)**2))/(2.*np.sqrt(W2))
     return res
+
+# virtual photon flux and transverse polarization functions
+def eps(W2,Q2,Ebeam):
+    nu=(W2-M**2+Q2)/(2.*M)
+    sin2th=Q2/(4.*Ebeam*(Ebeam-nu))
+    res=1./(1.+2.*(1.+nu**2/Q2)*sin2th/(1.-sin2th))
+    return res
+
+def gamv(W2,Q2,Ebeam):
+    nu=(W2-M**2+Q2)/(2.*M)
+    res=alpha/(4.*np.pi)*np.sqrt(W2)/(Ebeam*M)**2*(W2-M**2)/(Q2*(1.-eps(W2,Q2,Ebeam)))
+    return res
+	
     
 #Here come the actual structure functions. They read in W^2 and Q^2 in GeV^2, and also a list of 12 flags of the type [1,0,0,0,1,0,...] that mark whether single resonances are turned on or off. If all should be on, pass the list where all flags are set to 1. Finally, the last argument turns on interference effects for interf=1 (coherent sum at amplitude level) or it's turned off for interf=0 (sum at cross-section level).
 
@@ -232,8 +245,6 @@ def get_F2(W2,Q2,flags,interf):
         g0rsqr+=(g0r[7]*np.conj(g0r[11])+g0r[11]*np.conj(g0r[7]))/1.72*flags[7]*flags[11]
     res=M*nu/(1.+nu**2/Q2)*(gprsqr+gmrsqr+2.*g0rsqr)
     return np.real(res)
-
-
 
     
 def get_g1(W2,Q2,flags,interf):
@@ -350,12 +361,29 @@ def get_A2(W2,Q2,flags,interf):
     nu=(W2-M**2+Q2)/(2.*M)
     res=np.sqrt(Q2)/nu*(get_g1(W2,Q2,flags,interf)+get_g2(W2,Q2,flags,interf))/get_F1(W2,Q2,flags,interf)
     return res
+
+def get_sigT(W2,Q2,flags,interf):
+    nu=(W2-M**2+Q2)/(2.*M)
+    res=8.*np.pi**2*alpha/(W2-M**2)*get_F1(W2,Q2,flags,interf)*389.379
+    return res
+
+def get_sigL(W2,Q2,flags,interf):
+    nu=(W2-M**2+Q2)/(2.*M)
+    xbj=Q2/(2.*M*nu)
+    res=8.*np.pi**2*alpha/(W2-M**2)*((1.+Q2/nu**2)/(2.*xbj)*get_F2(W2,Q2,flags,interf)-get_F1(W2,Q2,flags,interf))*389.379
+    return res
+
+def get_dXS(W2,Q2,Ebeam,flags,interf):
+    res=1000.*(get_sigT(W2,Q2,flags,interf)+eps(W2,Q2,Ebeam)*get_sigL(W2,Q2,flags,interf))*gamv(W2,Q2,Ebeam)
+    return res
     
 
 print('Specify the Q2 value in GeV^2:')
 Q2user=input()
 print('Specify the W value in GeV:')
 Wuser=input()
+print('Specify the beam energy value in GeV (only needed for differential cross section):')
+Ebuser=input()
 print('Do you want to include interferences? 1/0')
 interfyn=input()
 if interfyn==1:
@@ -372,9 +400,20 @@ print('If you press enter or do not have a total of 12 values:')
 print('the DEFAULT 1,1,1,1,1,1,1,1,1,1,1,1 is chosen (sum over all resonances).')
 resar=[1,1,1,1,1,1,1,1,1,1,1,1]
 reschoi=raw_input().split(',')
+default=0
 if len(reschoi)==12:
 	for i in range(len(reschoi)):
-		resar[i]=int(reschoi[i])
+		if int(reschoi[i])!=0 and int(reschoi[i])!=1:
+			default=1
+	if default==0:
+		for i in range(len(reschoi)):
+			resar[i]=int(reschoi[i])
+	else:
+		print('You can choose only 0 or 1 values.')
+		print('Using the default: 1,1,1,1,1,1,1,1,1,1,1,1.')
+else:
+	print('You must insert a total of 12 values.')
+	print('Using the default: 1,1,1,1,1,1,1,1,1,1,1,1.')
 
 
 print('F1 = %.5f'%get_F1(Wuser**2,Q2user,resar,interf))
@@ -386,3 +425,6 @@ print('H1/2 = %.5f'%get_H12(Wuser**2,Q2user,resar,interf))
 print('H3/2 = %.5f'%get_H32(Wuser**2,Q2user,resar,interf))
 print('A1 = %.5f'%get_A1(Wuser**2,Q2user,resar,interf))
 print('A2 = %.5f'%get_A2(Wuser**2,Q2user,resar,interf))
+print('sigT [mub] = %.5f'%get_sigT(Wuser**2,Q2user,resar,interf))
+print('sigL [mub] = %.5f'%get_sigL(Wuser**2,Q2user,resar,interf))
+print('dsig/(dQ2dW) [nb/GeV^3] = %.5f'%get_dXS(Wuser**2,Q2user,Ebuser,resar,interf))
