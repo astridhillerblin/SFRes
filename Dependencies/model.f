@@ -290,7 +290,8 @@
 	sigt=8.d0*pi**2*alpha/(wsq-mn**2)*f1tot*389.379
 	sigl=8.d0*pi**2*alpha/(wsq-mn**2)*
      >		((1.d0+qsq/nu**2)/(2.d0*xbj)*f2tot-f1tot)*389.379
-	dxsdq2dw=(sigt+eps(wsq,qsq,ebeam)*sigl)*gamv(wsq,qsq,ebeam)
+	dxsdq2dw=1000.d0*
+     >		(sigt+eps(wsq,qsq,ebeam)*sigl)*gamv(wsq,qsq,ebeam)
 	endsubroutine res_calc
 !======================================================================!
 ! G+, G0, G- helicity amplitudes

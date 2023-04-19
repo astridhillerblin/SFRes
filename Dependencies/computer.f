@@ -46,7 +46,8 @@
 	write (100+iloop,"(25(A10))") "W [GeV]","<F1>","DF1",
      >	"<F2>","DF2","<FL>","DFL","<g1>","Dg1","<g2>","Dg2",
      >	"<H1/2>","DH1/2","<H3/2>","DH3/2","<A1>","DA1","<A2>","DA2",
-     >	"<sigT>","DsigT","<sigL>","DsigL","<dXS>","dXS"
+     >	"<sigT> [mub]","DsigT [mub]","<sigL> [mub]","DsigL [mub]",
+     >	"<dXS> [nb]","dXS [nb]"
 	do readinit=1,113
 	readwhich=readinit
 	open (201,file='Output/res_samp.dat')

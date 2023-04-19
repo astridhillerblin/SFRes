@@ -107,7 +107,8 @@
 	enddo
 	flag(rloop) = 1.d0
 	write (iwrt,"(13(A10))") "W [GeV]","F1","F2","FL","g1","g2"
-     >			,"H1/2","H3/2","A1","A2","sigT","sigL","dXS"
+     >			,"H1/2","H3/2","A1","A2"
+     >			,"sigT [mub]","sigL [mub]","dXS [nb]"
 ! The observables are calculated and written:
 	do jloop = 0,112
 	wsq = (1.08+0.01d0*jloop)**2!starts just above threshold
@@ -128,7 +129,8 @@
 	open (iwrt, file = sing_file(19+iloop))
 	interf = (iloop-1)*1.d0
 	write (iwrt,"(13(A10))") "W [GeV]","F1","F2","FL","g1","g2"
-     >			,"H1/2","H3/2","A1","A2","sigT","sigL","dXS"
+     >			,"H1/2","H3/2","A1","A2"
+     >			,"sigT [mub]","sigL [mub]","dXS [nb]"
 	do jloop = 0,112
 	wsq = (1.08+0.01d0*jloop)**2!starts just above threshold
 	call res_calc(wsq,qsq,ebeam)
